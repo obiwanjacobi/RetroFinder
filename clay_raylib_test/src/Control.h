@@ -12,5 +12,5 @@ public:
     Control(Control&&) = delete;
     Control& operator=(Control&&) = delete;
 
-    virtual void Layout(Theme* theme) = 0;
+    virtual void Declare(Theme* theme) = 0;
 };

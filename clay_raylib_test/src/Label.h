@@ -13,7 +13,7 @@ public:
     Label(Label&&) = delete;
     Label& operator=(Label&&) = delete;
 
-    void Layout(Theme* theme) override {
+    void Declare(Theme* theme) override {
         CLAY_TEXT(_text, CLAY_TEXT_CONFIG({
             .userData = (void*)theme->GetFontArray(),
             .textColor = theme->GetForegroundColor(),

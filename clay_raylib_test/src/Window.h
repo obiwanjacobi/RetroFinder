@@ -1,10 +1,9 @@
 #pragma once
 #include "clay_renderer_raylib.h"
 
-#include "Theme.h"
 #include "Control.h"
-
-#include <vector>
+#include "Panel.h"
+#include "Theme.h"
 
 class Window {
 public:
@@ -15,8 +14,6 @@ public:
     Window& operator=(const Window&) = delete;
     Window(Window&&) = delete;
     Window& operator=(Window&&) = delete;
-
-    void AddControl(Control* control) { _controls.push_back(control); }
 
     bool ShouldClose() const { return ::WindowShouldClose(); }
     bool IsReady() const { return ::IsWindowReady(); }
@@ -54,7 +51,9 @@ public:
 
     void SetTheme(Theme* theme) { _theme = theme; }
     Theme* GetTheme() const { return _theme; }
+
+    Panel& Screen() { return _screen; }  
 private:
     Theme* _theme = nullptr;
-    std::vector<Control*> _controls;
+    Panel _screen;
 };

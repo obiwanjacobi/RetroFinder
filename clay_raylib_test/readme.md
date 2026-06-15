@@ -1,16 +1,28 @@
-# Simple cross-platform C++ starter
+# Clay + Raylib
+
+**Raylib**
+
+Web: https://www.raylib.com/index.html
+
+Github: https://github.com/raysan5/raylib
+
+**Clay**
+
+Web: https://deepwiki.com/nicbarker/clay/1-overview
+
+Github: https://github.com/nicbarker/clay
+
+## Build
 
 This project builds a single executable without CMake or any external build system.
 It follows the raylib VSCode template style but keeps script-based builds (`build.ps1`/`build.sh`) instead of make tasks.
 
-## Structure
+### Structure
 
 - `src/main.cpp` contains the program entry point.
 - `build.ps1` builds on Windows with `cl`, `g++`, or `clang++`.
 - `build.sh` builds on Linux and macOS with `c++`, `g++`, or `clang++`.
 - `.vscode/tasks.json` adds a default VS Code build task.
-
-## Build
 
 ### Windows
 
