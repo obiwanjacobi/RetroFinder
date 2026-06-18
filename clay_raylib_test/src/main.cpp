@@ -1,18 +1,17 @@
-#include "raylib.h"
-#include "clay.h"
-#include "Window.h"
+#include "project.h"
+#include "MacWindow.h"
 #include "Label.h"
 #include "Theme.h"
 #include "ThemeColors.h"
 
-Window* g_window = nullptr;
+MacWindow* g_window = nullptr;
 Theme* g_theme = nullptr;
 
 int main() {
     const int screenWidth = 1024;
     const int screenHeight = 768;
 
-    g_window = new Window(ConfigFlags::FLAG_WINDOW_UNDECORATED);
+    g_window = new MacWindow();
     g_window->SetSize(screenWidth, screenHeight);
     g_window->SetMinSize(450, 450);
     g_window->SetTitle("Raylib/Clay Test");

@@ -1,11 +1,10 @@
 #pragma once
-#include "clay_renderer_raylib.h"
-
+#include "project.h"
 #include "Control.h"
 #include "Panel.h"
 #include "Theme.h"
 
-class Window {
+class Window : public Control {
 public:
     Window(ConfigFlags configFlags);
     ~Window() { Clay_Raylib_Close(); }
@@ -48,11 +47,12 @@ public:
     Vector2 GetScaleDPI() const { return ::GetWindowScaleDPI(); }
 
     void Render();
+    void Declare(Theme* theme) override;
 
     void SetTheme(Theme* theme) { _theme = theme; }
     Theme* GetTheme() const { return _theme; }
 
-    Panel& Screen() { return _screen; }  
+    Panel& Screen() { return _screen; }
 private:
     Theme* _theme = nullptr;
     Panel _screen;

@@ -1,6 +1,6 @@
 #include "Window.h"
-#include "clay_renderer_raylib.h"
-#include <cstring>
+#include "project.h"
+#include <stdlib.h>
 
 void ErrorHandler(Clay_ErrorData errorText)
 {
@@ -18,13 +18,16 @@ Window::Window(ConfigFlags configFlags) : _screen(CLAY_ID("screen")) {
     Clay_Raylib_Initialize(1024, 768, "Clay/Raylib Test", configFlags);
     Clay_Initialize(arena,  Clay_Dimensions{1024, 768}, Clay_ErrorHandler{ ErrorHandler, this });
     Clay_SetMeasureTextFunction(Raylib_MeasureText, nullptr);
+}
 
+void Window::Declare(Theme* theme) {
     _screen.Layout() = Clay_LayoutConfig { 
         .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
-        .padding = { 16, 16, 16, 16 }, 
-        .childGap = 16,
+        .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
         .layoutDirection = CLAY_TOP_TO_BOTTOM
     };
+    
+    _screen.Declare(_theme);
 }
 
 void Window::Render()
@@ -43,7 +46,7 @@ void Window::Render()
     //Clay_UpdateScrollContainers(true, GetMouseWheelMoveV(), GetFrameTime());
 
     Clay_BeginLayout();
-    _screen.Declare(_theme);
+    Declare(_theme);
     auto commands = Clay_EndLayout(GetFrameTime());
 
     BeginDrawing();

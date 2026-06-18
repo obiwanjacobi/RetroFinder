@@ -8,7 +8,6 @@ $resDir = Join-Path $projectRoot "res"
 $outputPath = Join-Path $buildDir "app.exe"
 
 $localIncludeDirs = @(
-    (Join-Path $projectRoot "libs"),
     (Join-Path $projectRoot "libs\clay"),
     (Join-Path $projectRoot "libs\raylib")
 )
@@ -57,8 +56,19 @@ $sourceFiles = Get-ChildItem -Path $sourceRoots -Recurse -File |
     Sort-Object FullName |
     ForEach-Object { $_.FullName }
 
+$thirdPartySourceFiles = if (Test-Path $libsDir) {
+    $sourceFiles | Where-Object { $_.StartsWith($libsDir, [System.StringComparison]::OrdinalIgnoreCase) }
+} else {
+    @()
+}
+$projectSourceFiles = $sourceFiles | Where-Object { -not $_.StartsWith($libsDir, [System.StringComparison]::OrdinalIgnoreCase) }
+
 $cSourceFiles = $sourceFiles | Where-Object { [System.IO.Path]::GetExtension($_).ToLowerInvariant() -eq '.c' }
 $cppSourceFiles = $sourceFiles | Where-Object { @('.cc', '.cpp', '.cxx') -contains [System.IO.Path]::GetExtension($_).ToLowerInvariant() }
+$thirdPartyCSourceFiles = $thirdPartySourceFiles | Where-Object { [System.IO.Path]::GetExtension($_).ToLowerInvariant() -eq '.c' }
+$thirdPartyCppSourceFiles = $thirdPartySourceFiles | Where-Object { @('.cc', '.cpp', '.cxx') -contains [System.IO.Path]::GetExtension($_).ToLowerInvariant() }
+$projectCSourceFiles = $projectSourceFiles | Where-Object { [System.IO.Path]::GetExtension($_).ToLowerInvariant() -eq '.c' }
+$projectCppSourceFiles = $projectSourceFiles | Where-Object { @('.cc', '.cpp', '.cxx') -contains [System.IO.Path]::GetExtension($_).ToLowerInvariant() }
 
 if (-not $sourceFiles -or $sourceFiles.Count -eq 0) {
     Write-Error "No C/C++ source files found in $srcDir or $libsDir"
@@ -97,6 +107,71 @@ function Import-VsDevShell {
     }
 
     return $true
+}
+
+function Invoke-CheckedCompiler {
+    param(
+        [string]$CompilerPath,
+        [string[]]$CompilerArgs,
+        [string]$CompilerDisplayName
+    )
+
+    & $CompilerPath @CompilerArgs
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Compilation failed with exit code $LASTEXITCODE using $CompilerDisplayName."
+    }
+}
+
+function Add-SourceGroup {
+    param(
+        [ref]$ArgListRef,
+        [string[]]$Files,
+        [string]$Language,
+        [string[]]$Flags = @()
+    )
+
+    if (-not $Files) {
+        return
+    }
+
+    if ($Flags -and $Flags.Count -gt 0) {
+        $ArgListRef.Value += $Flags
+    }
+    $ArgListRef.Value += @('-x', $Language)
+    $ArgListRef.Value += $Files
+}
+
+function Invoke-GnuStyleBuild {
+    param(
+        [string]$CompilerPath,
+        [string[]]$ProjectWarningFlags,
+        [bool]$UseRaylib
+    )
+
+    $compileArgs = @('-std=c++20', '-g3', '-O0', '-fno-omit-frame-pointer')
+    foreach ($includeDir in $localIncludeDirs) {
+        $compileArgs += "-I$includeDir"
+    }
+    if ($UseRaylib) {
+        $compileArgs += @("-I$raylibIncludeDir", "-L$raylibLibDir")
+    }
+
+    Add-SourceGroup -ArgListRef ([ref]$compileArgs) -Files $thirdPartyCSourceFiles -Language 'c' -Flags @('-w')
+    Add-SourceGroup -ArgListRef ([ref]$compileArgs) -Files $thirdPartyCppSourceFiles -Language 'c++' -Flags @('-w')
+    Add-SourceGroup -ArgListRef ([ref]$compileArgs) -Files $projectCSourceFiles -Language 'c' -Flags $ProjectWarningFlags
+    Add-SourceGroup -ArgListRef ([ref]$compileArgs) -Files $projectCppSourceFiles -Language 'c++' -Flags $ProjectWarningFlags
+
+    if (-not $projectCSourceFiles -and -not $projectCppSourceFiles) {
+        # If only third-party sources exist, keep default project warnings enabled.
+        $compileArgs += $ProjectWarningFlags
+    }
+
+    $compileArgs += @('-o', $outputPath)
+    if ($UseRaylib) {
+        $compileArgs += @('-lraylib', '-lopengl32', '-lgdi32', '-lwinmm')
+    }
+
+    Invoke-CheckedCompiler -CompilerPath $CompilerPath -CompilerArgs $compileArgs -CompilerDisplayName $compiler.Name
 }
 
 $compilerPreference = @('cl', 'g++', 'clang++')
@@ -142,7 +217,8 @@ switch ($compilerName) {
         if ($useRaylib) {
             $clArgs += @('/link', '/DEBUG', "/LIBPATH:$raylibLibDir", 'raylib.lib', 'opengl32.lib', 'gdi32.lib', 'winmm.lib', 'user32.lib', 'shell32.lib')
         }
-        & $compiler.Source @clArgs
+
+        Invoke-CheckedCompiler -CompilerPath $compiler.Source -CompilerArgs $clArgs -CompilerDisplayName $compiler.Name
         break
     }
     "g++" {
@@ -154,28 +230,8 @@ switch ($compilerName) {
             Write-Host "g++ selected but libraylib.a was not found. Building without Raylib link flags."
         }
 
-        $gnuArgs = @('-std=c++20', '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-g3', '-O0', '-fno-omit-frame-pointer')
-        foreach ($includeDir in $localIncludeDirs) {
-            $gnuArgs += "-I$includeDir"
-        }
-        if ($useRaylib) {
-            $gnuArgs += @("-I$raylibIncludeDir", "-L$raylibLibDir")
-        }
-
-        if ($cSourceFiles) {
-            $gnuArgs += @('-x', 'c')
-            $gnuArgs += $cSourceFiles
-        }
-        if ($cppSourceFiles) {
-            $gnuArgs += @('-x', 'c++')
-            $gnuArgs += $cppSourceFiles
-        }
-
-        $gnuArgs += @('-o', $outputPath)
-        if ($useRaylib) {
-            $gnuArgs += @('-lraylib', '-lopengl32', '-lgdi32', '-lwinmm')
-        }
-        & $compiler.Source @gnuArgs
+        $gppWarnings = @('-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wmisleading-indentation')
+        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $gppWarnings -UseRaylib $useRaylib
         break
     }
     "clang++" {
@@ -187,28 +243,8 @@ switch ($compilerName) {
             Write-Host "clang++ selected but libraylib.a was not found. Building without Raylib link flags."
         }
 
-        $clangArgs = @('-std=c++20', '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-g3', '-O0', '-fno-omit-frame-pointer')
-        foreach ($includeDir in $localIncludeDirs) {
-            $clangArgs += "-I$includeDir"
-        }
-        if ($useRaylib) {
-            $clangArgs += @("-I$raylibIncludeDir", "-L$raylibLibDir")
-        }
-
-        if ($cSourceFiles) {
-            $clangArgs += @('-x', 'c')
-            $clangArgs += $cSourceFiles
-        }
-        if ($cppSourceFiles) {
-            $clangArgs += @('-x', 'c++')
-            $clangArgs += $cppSourceFiles
-        }
-
-        $clangArgs += @('-o', $outputPath)
-        if ($useRaylib) {
-            $clangArgs += @('-lraylib', '-lopengl32', '-lgdi32', '-lwinmm')
-        }
-        & $compiler.Source @clangArgs
+        $clangWarnings = @('-Wall', '-Wextra', '-Wno-missing-field-initializers')
+        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $clangWarnings -UseRaylib $useRaylib
         break
     }
     default {
@@ -222,3 +258,5 @@ if (Test-Path $resDir) {
     Copy-Item -Path (Join-Path $resDir "*") -Destination $buildDir -Recurse -Force
     Write-Host "Copied resources from $resDir to $buildDir"
 }
+
+Write-Host "Done."

@@ -1,10 +1,11 @@
 #pragma once
-#include "clay_renderer_raylib.h"
+#include "project.h"
 #include "Control.h"
 #include <vector>
 
 class Panel : public Control{
 public:
+    Panel() : _id(CLAY_ID("panel")) {}
     Panel(Clay_ElementId id) : _id(id) {}
     ~Panel() = default;
 
@@ -13,12 +14,7 @@ public:
     Panel(Panel&&) = delete;
     Panel& operator=(Panel&&) = delete;
 
-    inline void Declare(Theme* theme) override {
-        CLAY(_id, { .layout = _layout, .backgroundColor = theme->GetBackgroundColor() }); {
-            for (auto* control : _controls)
-                control->Declare(theme);
-        }
-    }
+    void Declare(Theme* theme) override;
 
     Clay_LayoutConfig& Layout() { return _layout; }
 
