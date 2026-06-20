@@ -1,12 +1,12 @@
 #include "Panel.h"
 
-void Panel::Declare(Theme* theme) {
-    CLAY(_id, { 
-            .layout = _layout, 
-            .backgroundColor = theme->GetBackgroundColor(),
-            .border = { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) },
-        }) {
-        for (auto* control : _controls)
-            control->Declare(theme);
+void Panel::Prepare(Theme* theme, BoxStyle& style) {
+    ContainerControl::Prepare(theme, style);
+    
+    if (!HasBackgroundColor()) {
+        style.backgroundColor = theme->GetBackgroundColor();
     }
+    // if (!HasBorder()) {
+    //     style.border = Clay_BorderElementConfig { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) };
+    // }
 }

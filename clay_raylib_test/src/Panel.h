@@ -1,12 +1,11 @@
 #pragma once
 #include "project.h"
-#include "Control.h"
-#include <vector>
+#include "ContainerControl.h"
 
-class Panel : public Control{
+class Panel : public ContainerControl {
 public:
     Panel() : Panel(CLAY_ID("panel")) {}
-    Panel(Clay_ElementId id) : _id(id), _layout({}) {}
+    explicit Panel(Clay_ElementId id) : ContainerControl(id) {}
     ~Panel() = default;
 
     Panel(const Panel&) = delete;
@@ -14,14 +13,6 @@ public:
     Panel(Panel&&) = delete;
     Panel& operator=(Panel&&) = delete;
 
-    void Declare(Theme* theme) override;
-
-    Clay_LayoutConfig& Layout() { return _layout; }
-
-    void Add(Control* control) { _controls.push_back(control); }
-
-private:
-    Clay_ElementId _id;
-    Clay_LayoutConfig _layout;
-    std::vector<Control*> _controls;
+protected:
+    void Prepare(Theme* theme, BoxStyle& style) override;
 };

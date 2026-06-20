@@ -36,8 +36,12 @@ void PatternPanel::SetPixelScale(uint16_t pixelScale) {
     _tileDirty = true;
 }
 
-void PatternPanel::Declare(Theme* theme) {
-    Clay_ElementData panelData = Clay_GetElementData(_id);
+void PatternPanel::Prepare(Theme* theme, BoxStyle& style) {
+    ContainerControl::Prepare(theme, style);
+    // reset background so our pattern is shown (not painted over)
+    style.backgroundColor = Clay_Color { 0 };
+
+    Clay_ElementData panelData = Clay_GetElementData(Id());
     float panelWidth  = panelData.found ? panelData.boundingBox.width  : 0.0f;
     float panelHeight = panelData.found ? panelData.boundingBox.height : 0.0f;
 
@@ -71,18 +75,6 @@ void PatternPanel::Declare(Theme* theme) {
         _tileDirty = false;
     }
 
-    Clay_ImageElementConfig imageConfig = {};
-    imageConfig.imageData = _tileTextureLoaded ? &_tileTexture : nullptr;
-
-    CLAY(_id, {
-            .layout = _layout,
-            .backgroundColor = theme->GetBackgroundColor(),
-            .image = imageConfig,
-            .clip = { .horizontal = true, .vertical = true },
-            //.border = { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) },
-        }) {
-        for (auto* control : _controls) {
-            control->Declare(theme);
-        }
-    }
+    style.image.imageData = _tileTextureLoaded ? &_tileTexture : nullptr;
+    style.clip = Clay_ClipElementConfig { .horizontal = true, .vertical = true };
 }

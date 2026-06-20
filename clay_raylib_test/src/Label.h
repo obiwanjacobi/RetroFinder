@@ -3,9 +3,10 @@
 #include "Control.h"
 #include "Theme.h"
 
-class Label : public Control{
+class Label : public Control {
 public:
-    Label() = default;
+    Label() : Label(CLAY_ID("label")) {}
+    explicit Label(Clay_ElementId id) : Control(id) {}
     ~Label() = default;
 
     Label(const Label&) = delete;
@@ -13,7 +14,8 @@ public:
     Label(Label&&) = delete;
     Label& operator=(Label&&) = delete;
 
-    void Declare(Theme* theme) override {
+protected:
+    void DeclareContent(Theme* theme) override {
         CLAY_TEXT(_text, CLAY_TEXT_CONFIG({
             .userData = (void*)theme->GetFontArray(),
             .textColor = theme->GetForegroundColor(),
@@ -23,6 +25,7 @@ public:
         }));
     }
 
+public:
     void SetText(Clay_String text) { _text = text; }
     const Clay_String& GetText() const { return _text; }
 

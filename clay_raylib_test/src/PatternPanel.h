@@ -1,29 +1,21 @@
 #pragma once
 
 #include "project.h"
-#include "Control.h"
+#include "ContainerControl.h"
 #include "PatternTileGenerator.h"
 
-#include <vector>
-
-class PatternPanel : public Control {
+class PatternPanel : public ContainerControl {
 public:
     using PatternStyle = PatternTileGenerator::PatternStyle;
 
     PatternPanel() : PatternPanel(CLAY_ID("patternpanel")) {}
-    PatternPanel(Clay_ElementId id) : _id(id), _layout({}) {}
+    explicit PatternPanel(Clay_ElementId id) : ContainerControl(id) {}
     ~PatternPanel() override;
 
     PatternPanel(const PatternPanel&) = delete;
     PatternPanel& operator=(const PatternPanel&) = delete;
     PatternPanel(PatternPanel&&) = delete;
     PatternPanel& operator=(PatternPanel&&) = delete;
-
-    void Declare(Theme* theme) override;
-
-    Clay_LayoutConfig& Layout() { return _layout; }
-
-    void Add(Control* control) { _controls.push_back(control); }
 
     void SetPatternStyle(PatternStyle style);
     PatternStyle GetPatternStyle() const { return _patternStyle; }
@@ -35,9 +27,7 @@ public:
     uint16_t GetPixelScale() const { return _pixelScale; }
 
 private:
-    Clay_ElementId _id;
-    Clay_LayoutConfig _layout;
-    std::vector<Control*> _controls;
+    void Prepare(Theme* theme, BoxStyle& style) override;
 
     PatternStyle _patternStyle = PatternStyle::Dots;
     uint16_t _tileSize = 8;

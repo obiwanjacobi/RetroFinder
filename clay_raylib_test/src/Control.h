@@ -4,7 +4,8 @@
 
 class Control {
 public:
-    Control() = default;
+    Control() : Control(CLAY_ID("control")) {}
+    explicit Control(Clay_ElementId id) : _id(id) {}
     virtual ~Control() = default;
 
     Control(const Control&) = delete;
@@ -12,5 +13,57 @@ public:
     Control(Control&&) = delete;
     Control& operator=(Control&&) = delete;
 
-    virtual void Declare(Theme* theme) = 0;
+    Clay_LayoutConfig& Layout() { return _layout; }
+    const Clay_LayoutConfig& Layout() const { return _layout; }
+
+    void SetBackgroundColor(Clay_Color color) {
+        _backgroundColor = color;
+        _hasBackgroundColor = true;
+    }
+    void ClearBackgroundColor() {
+        _backgroundColor = Clay_Color { 0 };
+        _hasBackgroundColor = false;
+    }
+    bool HasBackgroundColor() const { return _hasBackgroundColor; }
+    const Clay_Color& GetBackgroundColor() const { return _backgroundColor; }
+
+    void SetBorder(Clay_BorderElementConfig border) {
+        _border = border;
+        _hasBorder = true;
+    }
+    void ClearBorder() {
+        _border = Clay_BorderElementConfig {};
+        _hasBorder = false;
+    }
+    bool HasBorder() const { return _hasBorder; }
+    const Clay_BorderElementConfig& GetBorder() const { return _border; }
+
+    void Declare(Theme* theme);
+
+protected:
+    struct BoxStyle {
+        Clay_Color backgroundColor = {0};
+        Clay_Color overlayColor = {0};
+        Clay_CornerRadius cornerRadius = {};
+        Clay_AspectRatioElementConfig aspectRatio = {};
+        Clay_BorderElementConfig border = {};
+        Clay_ImageElementConfig image = {};
+        Clay_FloatingElementConfig floating = {};
+        Clay_CustomElementConfig custom = {};
+        Clay_ClipElementConfig clip = {};
+    };
+
+    Clay_ElementId Id() const { return _id; }
+
+    virtual void Prepare(Theme* theme, BoxStyle& style);
+
+    virtual void DeclareContent(Theme* theme) = 0;
+
+private:
+    Clay_ElementId _id;
+    Clay_LayoutConfig _layout = {};
+    Clay_Color _backgroundColor = {0};
+    Clay_BorderElementConfig _border = {};
+    bool _hasBackgroundColor = false;
+    bool _hasBorder = false;
 };

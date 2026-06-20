@@ -1,10 +1,9 @@
 #pragma once
 #include "project.h"
-#include "Control.h"
 #include "Panel.h"
 #include "Theme.h"
 
-class Window : public Control {
+class Window {
 public:
     Window(ConfigFlags configFlags);
     ~Window() { Clay_Raylib_Close(); }
@@ -47,7 +46,7 @@ public:
     Vector2 GetScaleDPI() const { return ::GetWindowScaleDPI(); }
 
     void Render();
-    void Declare(Theme* theme) override;
+    virtual void Declare(Theme* theme);
 
     void SetTheme(Theme* theme) { _theme = theme; }
     Theme* GetTheme() const { return _theme; }
