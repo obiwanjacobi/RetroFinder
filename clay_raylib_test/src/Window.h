@@ -53,6 +53,7 @@ public:
     Theme* GetTheme() const { return _theme; }
 
     Panel& Screen() { return _screen; }
+
 private:
     Theme* _theme = nullptr;
     Panel _screen;

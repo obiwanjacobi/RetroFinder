@@ -32,7 +32,8 @@ Image PatternTileGenerator::Generate(
                     on = (x % 4 == 1) && (y % 4 == 1);
                     break;
                 case PatternStyle::HorizontalLines:
-                    on = (y % 4) == 0;
+                    // Equal rhythm: 1 row line, 1 row space.
+                    on = (y % 2) == 0;
                     break;
             }
 

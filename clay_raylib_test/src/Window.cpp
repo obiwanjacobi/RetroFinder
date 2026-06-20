@@ -20,13 +20,15 @@ Window::Window(ConfigFlags configFlags) : _screen(CLAY_ID("screen")) {
     Clay_SetMeasureTextFunction(Raylib_MeasureText, nullptr);
 }
 
-void Window::Declare(Theme* theme) {
+void Window::Declare(Theme* theme)
+{
     _screen.Layout() = Clay_LayoutConfig { 
         .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
+        .padding = { .left = 12, .right = 12, .top = 12, .bottom = 12 },
         .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
         .layoutDirection = CLAY_TOP_TO_BOTTOM
     };
-    
+    _screen.SetBorder({ .color = theme->GetForegroundColor(), .width = 10 });
     _screen.Declare(_theme);
 }
 

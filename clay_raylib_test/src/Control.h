@@ -40,6 +40,11 @@ public:
 
     void Declare(Theme* theme);
 
+    // Returns true if the pointer (set via Clay_SetPointerState) is over this
+    // element's bounding box from the previous frame. Safe to call anywhere
+    // in Declare/DeclareContent/Prepare.
+    bool IsPointerOver() const { return Clay_PointerOver(_id); }
+
 protected:
     struct BoxStyle {
         Clay_Color backgroundColor = {0};
