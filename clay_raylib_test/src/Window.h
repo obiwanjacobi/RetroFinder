@@ -29,6 +29,7 @@ public:
     void Maximize() { ::MaximizeWindow(); }
     void Minimize() { ::MinimizeWindow(); }
     void Restore() { ::RestoreWindow(); }
+    void Close() { ::CloseWindow(); }
 
     void SetIcon(Image image) { ::SetWindowIcon(image); }
     void SetIcons(Image *images, int count) { ::SetWindowIcons(images, count); }

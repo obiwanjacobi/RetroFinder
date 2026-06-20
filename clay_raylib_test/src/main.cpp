@@ -28,14 +28,15 @@ int main() {
     g_window->SetTheme(g_theme);
 
     Label lbl;
-    lbl.SetText(CLAY_STRING("raylib template integrated (PowerShell build)"));
+    lbl.SetText(CLAY_STRING("raylib-clay test application"));
     g_window->Screen().Add(&lbl);
 
     while (!g_window->ShouldClose()) {
         g_window->Render();
     }
     
-    CloseWindow();
+    g_window->Close();
+    
     delete g_theme;
     delete g_window;
     return 0;

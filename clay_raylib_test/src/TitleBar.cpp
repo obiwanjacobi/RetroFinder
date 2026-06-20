@@ -1,13 +1,19 @@
 #include "TitleBar.h"
 
-TitleBar::TitleBar(Clay_ElementId id)
-        : Panel(id),
-            _panel(CLAY_ID("titlebar_pattern")),
-            _leftButton(CLAY_ID("titlebar_left_button")),
-            _rightButton(CLAY_ID("titlebar_right_button")),
-            _leftGap(CLAY_ID("titlebar_left_gap")),
-            _rightGap(CLAY_ID("titlebar_right_gap")),
-            _title(CLAY_ID("titlebar_title")) {
+TitleBar::TitleBar(Clay_ElementId id) : Panel(id),
+    _panel(CLAY_ID("titlebar_pattern")),
+    _leftButton(CLAY_ID("titlebar_left_button")),
+    _rightButton(CLAY_ID("titlebar_right_button")),
+    _leftGap(CLAY_ID("titlebar_left_gap")),
+    _rightGap(CLAY_ID("titlebar_right_gap")),
+    _title(CLAY_ID("titlebar_title"))
+{
+    _leftButton.SetText(CLAY_STRING("-"));
+    _rightButton.SetText(CLAY_STRING("X"));
+
+    _leftButton.SetOnClick([](){ MinimizeWindow(); });
+    _rightButton.SetOnClick([](){ CloseWindow(); });
+
     _panel.Add(&_leftButton);
     _panel.Add(&_leftGap);
     _panel.Add(&_title);
@@ -30,13 +36,9 @@ void TitleBar::DeclareContent(Theme* theme) {
 
     _leftButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(48), .height = CLAY_SIZING_FIXED(48) };
     _leftButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _leftButton.SetBackgroundColor(theme->GetBackgroundColor());
-    _leftButton.SetBorder(Clay_BorderElementConfig { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(3) });
 
     _rightButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(48), .height = CLAY_SIZING_FIXED(48) };
     _rightButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _rightButton.SetBackgroundColor(theme->GetBackgroundColor());
-    _rightButton.SetBorder(Clay_BorderElementConfig { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(3) });
 
     _leftGap.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(1) };
     _rightGap.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(1) };

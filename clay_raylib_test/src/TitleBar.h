@@ -1,5 +1,6 @@
 #pragma once
 #include "project.h"
+#include "Button.h"
 #include "Label.h"
 #include "Panel.h"
 #include "PatternPanel.h"
@@ -24,8 +25,8 @@ public:
     
 private:
     PatternPanel _panel;
-    Panel _leftButton;
-    Panel _rightButton;
+    Button _leftButton;
+    Button _rightButton;
     Spacer _leftGap;
     Spacer _rightGap;
     Label _title;

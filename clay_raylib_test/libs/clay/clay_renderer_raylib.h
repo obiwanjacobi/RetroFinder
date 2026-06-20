@@ -19,6 +19,9 @@ inline Clay_StringSlice ClayStringToSlice(Clay_String str) {
 const char* ClayStringToCString(Clay_StringSlice str);
 Color ClayColorToRaylibColor(Clay_Color color);
 
+inline Clay_Vector2 RaylibVector2ToClayVector2(Vector2 v) { return { v.x, v.y }; }
+inline Vector2 ClayVector2ToRaylibVector2(Clay_Vector2 v) { return { v.x, v.y }; }
+
 #ifdef __cplusplus
 }
 #endif

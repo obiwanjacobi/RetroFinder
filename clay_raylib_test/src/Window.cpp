@@ -43,7 +43,7 @@ void Window::Render()
     Clay_SetLayoutDimensions({ (float)GetScreenWidth(), (float)GetScreenHeight() });
     auto mouse = GetMousePosition();
     Clay_SetPointerState({ mouse.x, mouse.y }, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-    //Clay_UpdateScrollContainers(true, GetMouseWheelMoveV(), GetFrameTime());
+    Clay_UpdateScrollContainers(true, RaylibVector2ToClayVector2(GetMouseWheelMoveV()), GetFrameTime());
 
     Clay_BeginLayout();
     Declare(_theme);
