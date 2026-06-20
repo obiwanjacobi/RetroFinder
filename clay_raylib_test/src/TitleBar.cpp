@@ -11,15 +11,14 @@ TitleBar::TitleBar(Clay_ElementId id) : Panel(id),
     _title(CLAY_ID("titlebar_title"))
 {
     _leftButton.SetText(CLAY_STRING("-"));
-    _rightButton.SetText(CLAY_STRING("x"));
-
+    
     _pattern.Add(&_leftGap);
     _pattern.Add(&_title);
     _pattern.Add(&_rightGap);
 
     Add(&_pattern);
-    Add(&_leftEdge);
-    Add(&_rightEdge);
+    // Add(&_leftEdge);
+    // Add(&_rightEdge);
 
     _leftEdge.Add(&_leftButton);
     _rightEdge.Add(&_rightButton);
@@ -32,8 +31,8 @@ void TitleBar::DeclareContent(Theme* theme)
     constexpr uint16_t buttonWhitespace = 8;
     constexpr float buttonPlateWidth = buttonWidth + (buttonWhitespace * 2.0f);
 
-    Layout().padding = { .left = 8, .right = 8, .top = 0, .bottom = 0 };
-    //SetBorder({ .color = theme->GetForegroundColor(), .width = {0, 0, 0, 3, 0}});
+    Layout().padding = { .left = 8, .right = 8, .top = 8, .bottom = 16 };
+    SetBorder({ .color = theme->GetForegroundColor(), .width = {0, 0, 0, 6, 0}});
 
     // 6 lines with equal line/gap thickness at 6x: (6 lines + 5 gaps) * 6 = 66px.
     _pattern.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(barHeight) };
@@ -45,43 +44,49 @@ void TitleBar::DeclareContent(Theme* theme)
     _pattern.SetTileSize(12);
     _pattern.SetPixelScale(6);
 
-    _leftButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonWidth), .height = CLAY_SIZING_FIXED(buttonWidth) };
-    _leftButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _leftButton.SetBorder({ .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) });
+    if (_leftButton.HasOnClick())
+    {
+        _leftButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonWidth), .height = CLAY_SIZING_FIXED(buttonWidth) };
+        _leftButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
+        _leftButton.SetBorder({ .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) });
 
-    _leftEdge.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonPlateWidth), .height = CLAY_SIZING_FIXED(barHeight) };
-    _leftEdge.Layout().padding = { .left = buttonWhitespace, .right = buttonWhitespace, .top = 0, .bottom = 0 };
-    _leftEdge.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _leftEdge.SetBackgroundColor(theme->GetBackgroundColor());
-    _leftEdge.Floating() = Clay_FloatingElementConfig {
-        .offset = { 32, 0 },
-        .expand = { 0, 0 },
-        .parentId = 0,
-        .zIndex = 0,
-        .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_CENTER, .parent = CLAY_ATTACH_POINT_LEFT_CENTER },
-        .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-        .attachTo = CLAY_ATTACH_TO_PARENT,
-        .clipTo = CLAY_CLIP_TO_NONE,
-    };
+        _leftEdge.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonPlateWidth), .height = CLAY_SIZING_FIXED(buttonPlateWidth) };
+        _leftEdge.Layout().padding = { .left = buttonWhitespace, .right = buttonWhitespace, .top = 0, .bottom = 0 };
+        _leftEdge.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
+        _leftEdge.SetBackgroundColor(theme->GetBackgroundColor());
+        _leftEdge.Floating() = Clay_FloatingElementConfig {
+            .offset = { 32, 4 },
+            .expand = { 0, 0 },
+            .parentId = 0,
+            .zIndex = 0,
+            .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_TOP, .parent = CLAY_ATTACH_POINT_LEFT_TOP },
+            .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+            .attachTo = CLAY_ATTACH_TO_PARENT,
+            .clipTo = CLAY_CLIP_TO_NONE,
+        };
+    }
 
-    _rightButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonWidth), .height = CLAY_SIZING_FIXED(buttonWidth) };
-    _rightButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _rightButton.SetBorder({ .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) });
+    if (_rightButton.HasOnClick())
+    {
+        _rightButton.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonWidth), .height = CLAY_SIZING_FIXED(buttonWidth) };
+        _rightButton.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
+        _rightButton.SetBorder({ .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) });
 
-    _rightEdge.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonPlateWidth), .height = CLAY_SIZING_FIXED(barHeight) };
-    _rightEdge.Layout().padding = { .left = buttonWhitespace, .right = buttonWhitespace, .top = 0, .bottom = 0 };
-    _rightEdge.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
-    _rightEdge.SetBackgroundColor(theme->GetBackgroundColor());
-    _rightEdge.Floating() = Clay_FloatingElementConfig {
-        .offset = { -32, 0 },
-        .expand = { 0, 0 },
-        .parentId = 0,
-        .zIndex = 0,
-        .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER, .parent = CLAY_ATTACH_POINT_RIGHT_CENTER },
-        .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-        .attachTo = CLAY_ATTACH_TO_PARENT,
-        .clipTo = CLAY_CLIP_TO_NONE,
-    };
+        _rightEdge.Layout().sizing = { .width = CLAY_SIZING_FIXED(buttonPlateWidth), .height = CLAY_SIZING_FIXED(buttonPlateWidth) };
+        _rightEdge.Layout().padding = { .left = buttonWhitespace, .right = buttonWhitespace, .top = 0, .bottom = 0 };
+        _rightEdge.Layout().childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER };
+        _rightEdge.SetBackgroundColor(theme->GetBackgroundColor());
+        _rightEdge.Floating() = Clay_FloatingElementConfig {
+            .offset = { -32, 4 },
+            .expand = { 0, 0 },
+            .parentId = 0,
+            .zIndex = 0,
+            .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_TOP, .parent = CLAY_ATTACH_POINT_RIGHT_TOP },
+            .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+            .attachTo = CLAY_ATTACH_TO_PARENT,
+            .clipTo = CLAY_CLIP_TO_NONE,
+        };
+    }
 
     _leftGap.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(1) };
     _rightGap.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(1) };

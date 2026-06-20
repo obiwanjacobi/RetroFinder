@@ -2,6 +2,7 @@
 
 #include "Control.h"
 
+#include <algorithm>
 #include <vector>
 
 class ContainerControl : public Control {
@@ -16,6 +17,9 @@ public:
     ContainerControl& operator=(ContainerControl&&) = delete;
 
     void Add(Control* control) { _controls.push_back(control); }
+    void Remove(Control* control) {
+        _controls.erase(std::remove(_controls.begin(), _controls.end(), control), _controls.end());
+    }
 
 protected:
     void DeclareContent(Theme* theme) override {

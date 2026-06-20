@@ -24,6 +24,7 @@ public:
 
     void SetOnClick(ClickHandler handler) { _onClick = std::move(handler); }
     void ClearOnClick() { _onClick = nullptr; }
+    bool HasOnClick() { return _onClick != nullptr; }
 
 protected:
     void Prepare(Theme* theme, BoxStyle& style) override;

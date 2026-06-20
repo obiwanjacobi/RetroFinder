@@ -24,10 +24,22 @@ public:
     Clay_String GetTitle() { return _title.GetText(); }
 
     using ActionHandler = std::function<void()>;
-    void SetOnMinimize(ActionHandler handler) { _leftButton.SetOnClick(std::move(handler)); }
-    void ClearOnMinimize() { _leftButton.ClearOnClick(); }
-    void SetOnClose(ActionHandler handler) { _rightButton.SetOnClick(std::move(handler)); }
-    void ClearOnClose() { _rightButton.ClearOnClick(); }
+    void SetOnMinimize(ActionHandler handler) {
+        _leftButton.SetOnClick(std::move(handler));
+        Add(&_leftEdge);
+    }
+    void ClearOnMinimize() {
+        _leftButton.ClearOnClick();
+        Remove(&_leftEdge);
+    }
+    void SetOnClose(ActionHandler handler) { 
+        _rightButton.SetOnClick(std::move(handler));
+        Add(&_rightEdge);
+    }
+    void ClearOnClose() {
+        _rightButton.ClearOnClick();
+        Remove(&_rightEdge);
+    }
 
     using DragHandler = std::function<void(Vector2 delta)>;
     void SetOnDrag(DragHandler handler) { _onDrag = std::move(handler); }
