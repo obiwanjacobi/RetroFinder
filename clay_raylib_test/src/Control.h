@@ -15,6 +15,8 @@ public:
 
     Clay_LayoutConfig& Layout() { return _layout; }
     const Clay_LayoutConfig& Layout() const { return _layout; }
+    Clay_FloatingElementConfig& Floating() { return _floating; }
+    const Clay_FloatingElementConfig& Floating() const { return _floating; }
 
     void SetBackgroundColor(Clay_Color color) {
         _backgroundColor = color;
@@ -67,6 +69,7 @@ protected:
 private:
     Clay_ElementId _id;
     Clay_LayoutConfig _layout = {};
+    Clay_FloatingElementConfig _floating = {};
     Clay_Color _backgroundColor = {0};
     Clay_BorderElementConfig _border = {};
     bool _hasBackgroundColor = false;

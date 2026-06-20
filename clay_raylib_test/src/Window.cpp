@@ -28,7 +28,7 @@ void Window::Declare(Theme* theme)
         .childAlignment = { .x = CLAY_ALIGN_X_CENTER },
         .layoutDirection = CLAY_TOP_TO_BOTTOM
     };
-    _screen.SetBorder({ .color = theme->GetForegroundColor(), .width = 10 });
+    _screen.SetBorder({ .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(6) });
     _screen.Declare(_theme);
 }
 

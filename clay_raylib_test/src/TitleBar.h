@@ -20,8 +20,6 @@ public:
     TitleBar(TitleBar&&) = delete;
     TitleBar& operator=(TitleBar&&) = delete;
 
-    void DeclareContent(Theme* theme) override;
-
     void SetTitle(Clay_String title) { _title.SetText(title); }
     Clay_String GetTitle() { return _title.GetText(); }
 
@@ -35,12 +33,15 @@ public:
     void SetOnDrag(DragHandler handler) { _onDrag = std::move(handler); }
     void ClearOnDrag() { _onDrag = nullptr; }
 
+protected:
+    void DeclareContent(Theme* theme) override;
+
 private:
     PatternPanel _pattern;
-    Spacer _leftEdge;
+    Panel _leftEdge;
     Button _leftButton;
     Button _rightButton;
-    Spacer _rightEdge;
+    Panel _rightEdge;
     Spacer _leftGap;
     Spacer _rightGap;
     Label _title;
