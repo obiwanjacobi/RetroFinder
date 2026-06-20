@@ -27,5 +27,5 @@ public:
     const Clay_String& GetText() const { return _text; }
 
 private:
-    Clay_String _text;
+    Clay_String _text = CLAY_STRING("");
 };

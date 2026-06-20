@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-PatternPanel::PatternPanel(Clay_ElementId id) : _id(id) {}
-
 PatternPanel::~PatternPanel() {
     if (_tileTextureLoaded) {
         UnloadTexture(_tileTexture);
@@ -81,7 +79,7 @@ void PatternPanel::Declare(Theme* theme) {
             .backgroundColor = theme->GetBackgroundColor(),
             .image = imageConfig,
             .clip = { .horizontal = true, .vertical = true },
-            .border = { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) },
+            //.border = { .color = theme->GetForegroundColor(), .width = CLAY_BORDER_OUTSIDE(5) },
         }) {
         for (auto* control : _controls) {
             control->Declare(theme);

@@ -11,7 +11,7 @@ public:
     using PatternStyle = PatternTileGenerator::PatternStyle;
 
     PatternPanel() : PatternPanel(CLAY_ID("patternpanel")) {}
-    PatternPanel(Clay_ElementId id);
+    PatternPanel(Clay_ElementId id) : _id(id), _layout({}) {}
     ~PatternPanel() override;
 
     PatternPanel(const PatternPanel&) = delete;

@@ -5,8 +5,8 @@
 
 class Panel : public Control{
 public:
-    Panel() : _id(CLAY_ID("panel")) {}
-    Panel(Clay_ElementId id) : _id(id) {}
+    Panel() : Panel(CLAY_ID("panel")) {}
+    Panel(Clay_ElementId id) : _id(id), _layout({}) {}
     ~Panel() = default;
 
     Panel(const Panel&) = delete;

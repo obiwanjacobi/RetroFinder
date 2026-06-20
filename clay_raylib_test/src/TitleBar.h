@@ -18,6 +18,9 @@ public:
 
     void Declare(Theme* theme) override;
 
+    void SetTitle(Clay_String title) { _title.SetText(title); }
+    Clay_String GetTitle() { return _title.GetText(); }
+    
 private:
     PatternPanel _panel;
     Label _title;
