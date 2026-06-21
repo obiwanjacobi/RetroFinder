@@ -7,7 +7,7 @@ class Theme {
 public:
     Theme() : _font({0}) {}
     ~Theme() {
-        if (_font.baseSize) {
+        if (IsFontValid(_font)) {
             UnloadFont(_font);
         }
     };
@@ -39,9 +39,7 @@ public:
     Font* GetFontArray() { return &_font; } // for Clay
     const Font& GetFont() const { return _font; }
     void SetFont(const Font font) {
-        if (IsFontValid(_font)) {
-            UnloadFont(_font);
-        }
+        if (IsFontValid(_font)) { UnloadFont(_font); }
         _font = font;
     }
     bool LoadFont(const char* fontPath, uint16_t fontSize, TextureFilter textureFilter = TextureFilter::TEXTURE_FILTER_POINT);
