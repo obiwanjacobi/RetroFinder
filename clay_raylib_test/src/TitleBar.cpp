@@ -17,8 +17,6 @@ TitleBar::TitleBar(Clay_ElementId id) : Panel(id),
     _pattern.Add(&_rightGap);
 
     Add(&_pattern);
-    // Add(&_leftEdge);
-    // Add(&_rightEdge);
 
     _leftEdge.Add(&_leftButton);
     _rightEdge.Add(&_rightButton);

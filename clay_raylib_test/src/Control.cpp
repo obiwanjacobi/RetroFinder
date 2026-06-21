@@ -10,8 +10,6 @@ void Control::Prepare(Theme* theme, BoxStyle& style)
     if (_hasBorder) {
         style.border = _border;
     }
-
-    style.floating = _floating;
 }
 
 void Control::Declare(Theme* theme) {

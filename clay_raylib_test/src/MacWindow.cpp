@@ -6,9 +6,9 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
     _screen(CLAY_ID("client")), _titleBar(CLAY_ID("titlebar"))
 {
     _titleBar.SetTitle(CLAY_STRING("Window Title"));
-    // _titleBar.SetOnMinimize([this]() {
-    //     Minimize();
-    // });
+    _titleBar.SetOnMinimize([this]() {
+        Minimize();
+    });
     _titleBar.SetOnClose([this]() {
         Close();
     });

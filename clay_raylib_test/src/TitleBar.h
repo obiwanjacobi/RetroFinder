@@ -1,6 +1,7 @@
 #pragma once
 #include "project.h"
 #include "Button.h"
+#include "FloatingPanel.h"
 #include "Label.h"
 #include "Panel.h"
 #include "PatternPanel.h"
@@ -50,10 +51,10 @@ protected:
 
 private:
     PatternPanel _pattern;
-    Panel _leftEdge;
+    FloatingPanel _leftEdge;
     Button _leftButton;
     Button _rightButton;
-    Panel _rightEdge;
+    FloatingPanel _rightEdge;
     Spacer _leftGap;
     Spacer _rightGap;
     Label _title;
