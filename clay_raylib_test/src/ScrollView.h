@@ -37,6 +37,9 @@ public:
     // Resize handle
     void ShowResizeHandle(bool show) { _showResizeHandle = show; }
     bool IsResizeHandleVisible() const { return _showResizeHandle; }
+    
+    void SetResizeOnlyWhenScrollable(bool flag) { _resizeOnlyWhenScrollable = flag; }
+    bool GetResizeOnlyWhenScrollable() const { return _resizeOnlyWhenScrollable; }
 
     using ResizeHandler = std::function<void(Vector2 delta)>;
     void SetOnResize(ResizeHandler handler) { _onResize = std::move(handler); }
@@ -60,6 +63,7 @@ private:
     bool _showVerticalScrollbar = true;
     bool _showHorizontalScrollbar = true;
     bool _showResizeHandle = false;
+    bool _resizeOnlyWhenScrollable = false;
     ResizeHandler _onResize;
     Clay_ElementId _resizeHandleElementId = {};
     DragHandle _resizeDragHandle;

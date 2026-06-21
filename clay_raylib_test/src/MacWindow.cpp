@@ -18,10 +18,16 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
     });
     
     _screen.ShowResizeHandle(true);
+    _screen.SetResizeOnlyWhenScrollable(true);
     _screen.SetOnResize([this](Vector2 delta) {
         int width = GetRenderWidth();
         int height = GetRenderHeight();
-        SetSize(width + (int)roundf(delta.x), height + (int)roundf(delta.y));
+        int newWidth = width + (int)roundf(delta.x);
+        int newHeight = height + (int)roundf(delta.y);
+        // Clamp to minimum size for undecorated windows
+        newWidth = (newWidth < _minWidth) ? _minWidth : newWidth;
+        newHeight = (newHeight < _minHeight) ? _minHeight : newHeight;
+        SetSize(newWidth, newHeight);
     });
     
     Window::Screen().Add(&_titleBar);

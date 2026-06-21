@@ -18,9 +18,13 @@ public:
 
     ScrollView& Screen() { return _screen; }
 
+    void SetMinSize(int width, int height) { _minWidth = width; _minHeight = height; }
+
     void Declare(Theme* theme) override;
     
 private:
     ScrollView _screen;
     TitleBar _titleBar;
+    int _minWidth = 300;
+    int _minHeight = 200;
 };

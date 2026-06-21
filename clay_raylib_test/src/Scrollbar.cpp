@@ -42,6 +42,7 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme)
 
     // If no scroll target, render empty track without thumb
     if (!_hasScrollTarget) {
+        _thumbPercent = 1.0f;
         Control::BoxStyle trackStyle = {};
         if (vertical) {
             DeclareVerticalTrackAndThumb(theme, (float)_size, (float)_size, 0.0f, 0.0f, trackStyle);
@@ -81,6 +82,8 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme)
     }
 
     const float tailAxis = CLAY__MAX(trackAxis - thumbAxis - thumbOffset, 0.0f);
+    _thumbPercent = trackAxis > 0.0f ? (thumbAxis / trackAxis) : 1.0f;
+    _thumbPercent = CLAY__MAX(0.0f, CLAY__MIN(_thumbPercent, 1.0f));
 
     // Generate a unique thumb ID for this scrollbar
     _thumbElementId = CLAY_IDI("scrollbar_thumb", (_orientation << 16) | (uint32_t)_hasScrollTarget);

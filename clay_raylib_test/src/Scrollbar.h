@@ -29,6 +29,7 @@ public:
 
     void SetSize(uint32_t size) { _size = size; }
     uint32_t GetSize() const { return _size; }
+    float GetThumbPercent() const { return _thumbPercent; }
     void SetScrollTarget(Clay_ElementId id) {
         _scrollTargetId = id;
         _hasScrollTarget = true;
@@ -46,6 +47,7 @@ protected:
 private:
     Orientation _orientation;
     uint32_t _size = 36;
+    float _thumbPercent = 1.0f;
     Clay_ElementId _scrollTargetId = {};
     bool _hasScrollTarget = false;
     Clay_ElementId _thumbElementId = {};

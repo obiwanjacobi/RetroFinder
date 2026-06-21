@@ -18,13 +18,34 @@ void ScrollView::DeclareContent(Theme* theme) {
         _resizeHandleElementId = CLAY_IDI("scrollview_resize_handle", Id().id);
 
         _resizeDragHandle.SetCanStartDragPredicate([this]() {
+            // Start drag only when pressing on the resize handle.
             return Clay_PointerOver(_resizeHandleElementId);
         });
 
         _resizeDragHandle.SetOnDrag([this](Vector2 delta) {
-            if (_onResize) {
-                _onResize(delta);
+            if (!_onResize) {
+                return;
             }
+
+            Vector2 clampedDelta = delta;
+            // resize constraints
+            if (_resizeOnlyWhenScrollable) {
+                constexpr float kThumbFull = 0.999f;
+
+                // Stop enlarging each axis independently once that axis fully fits.
+                if (clampedDelta.x > 0.0f && _horizontalScrollbar.GetThumbPercent() >= kThumbFull) {
+                    clampedDelta.x = 0.0f;
+                }
+                if (clampedDelta.y > 0.0f && _verticalScrollbar.GetThumbPercent() >= kThumbFull) {
+                    clampedDelta.y = 0.0f;
+                }
+            }
+
+            if (clampedDelta.x == 0.0f && clampedDelta.y == 0.0f) {
+                return;
+            }
+
+            _onResize(clampedDelta);
         });
 
         Vector2 mouseScreenPos = { GetMousePosition().x + GetWindowPosition().x, GetMousePosition().y + GetWindowPosition().y };
