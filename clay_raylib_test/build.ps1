@@ -1,3 +1,7 @@
+param(
+    [switch]$Release
+)
+
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -5,7 +9,8 @@ $srcDir = Join-Path $projectRoot "src"
 $libsDir = Join-Path $projectRoot "libs"
 $buildDir = Join-Path $projectRoot "build"
 $resDir = Join-Path $projectRoot "res"
-$outputPath = Join-Path $buildDir "app.exe"
+$buildConfig = if ($Release) { "release" } else { "debug" }
+$outputPath = Join-Path $buildDir "app-$buildConfig.exe"
 
 $localIncludeDirs = @(
     (Join-Path $projectRoot "libs\clay"),
@@ -145,10 +150,16 @@ function Invoke-GnuStyleBuild {
     param(
         [string]$CompilerPath,
         [string[]]$ProjectWarningFlags,
-        [bool]$UseRaylib
+        [bool]$UseRaylib,
+        [bool]$Release = $false
     )
 
-    $compileArgs = @('-std=c++20', '-g3', '-O0', '-fno-omit-frame-pointer')
+    $compileArgs = @('-std=c++20')
+    if ($Release) {
+        $compileArgs += @('-O3', '-DNDEBUG')
+    } else {
+        $compileArgs += @('-g3', '-O0', '-fno-omit-frame-pointer')
+    }
     foreach ($includeDir in $localIncludeDirs) {
         $compileArgs += "-I$includeDir"
     }
@@ -206,7 +217,11 @@ switch ($compilerName) {
             Write-Host "MSVC selected but raylib.lib was not found. Building without Raylib link flags."
         }
 
-        $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/Zi', '/Od', "/Fe:$outputPath")
+        if ($Release) {
+            $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/O2', '/DNDEBUG', "/Fe:$outputPath")
+        } else {
+            $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/Zi', '/Od', "/Fe:$outputPath")
+        }
         foreach ($includeDir in $localIncludeDirs) {
             $clArgs += "/I$includeDir"
         }
@@ -215,7 +230,11 @@ switch ($compilerName) {
         }
         $clArgs += $sourceFiles
         if ($useRaylib) {
-            $clArgs += @('/link', '/DEBUG', "/LIBPATH:$raylibLibDir", 'raylib.lib', 'opengl32.lib', 'gdi32.lib', 'winmm.lib', 'user32.lib', 'shell32.lib')
+            $linkArgs = @('/link', "/LIBPATH:$raylibLibDir", 'raylib.lib', 'opengl32.lib', 'gdi32.lib', 'winmm.lib', 'user32.lib', 'shell32.lib')
+            if (-not $Release) {
+                $linkArgs = @('/link', '/DEBUG') + $linkArgs
+            }
+            $clArgs += $linkArgs
         }
 
         Invoke-CheckedCompiler -CompilerPath $compiler.Source -CompilerArgs $clArgs -CompilerDisplayName $compiler.Name
@@ -231,7 +250,7 @@ switch ($compilerName) {
         }
 
         $gppWarnings = @('-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wmisleading-indentation')
-        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $gppWarnings -UseRaylib $useRaylib
+        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $gppWarnings -UseRaylib $useRaylib -Release $Release
         break
     }
     "clang++" {
@@ -244,7 +263,7 @@ switch ($compilerName) {
         }
 
         $clangWarnings = @('-Wall', '-Wextra', '-Wno-missing-field-initializers')
-        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $clangWarnings -UseRaylib $useRaylib
+        Invoke-GnuStyleBuild -CompilerPath $compiler.Source -ProjectWarningFlags $clangWarnings -UseRaylib $useRaylib -Release $Release
         break
     }
     default {
@@ -252,7 +271,7 @@ switch ($compilerName) {
     }
 }
 
-Write-Host "Built $outputPath"
+Write-Host "Built $outputPath ($buildConfig mode)"
 
 if (Test-Path $resDir) {
     Copy-Item -Path (Join-Path $resDir "*") -Destination $buildDir -Recurse -Force
