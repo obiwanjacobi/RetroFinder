@@ -4,6 +4,7 @@
 #include "Theme.h"
 #include "Button.h"
 #include "Pattern.h"
+#include "DragHandle.h"
 
 class Scrollbar : public Control {
 public:
@@ -47,6 +48,8 @@ private:
     uint32_t _size = 36;
     Clay_ElementId _scrollTargetId = {};
     bool _hasScrollTarget = false;
+    Clay_ElementId _thumbElementId = {};
+    DragHandle _thumbDragHandle;
     Button _startButton;
     Button _endButton;
     Pattern _middlePattern;

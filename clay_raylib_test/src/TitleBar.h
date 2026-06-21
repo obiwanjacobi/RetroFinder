@@ -1,6 +1,7 @@
 #pragma once
 #include "project.h"
 #include "Button.h"
+#include "DragHandle.h"
 #include "FloatingPanel.h"
 #include "Label.h"
 #include "Panel.h"
@@ -61,6 +62,5 @@ private:
     Label _title;
 
     DragHandler _onDrag;
-    bool _isDragging = false;
-    Vector2 _lastDragMouseScreen = { 0, 0 };
+    DragHandle _dragHandle;
 };

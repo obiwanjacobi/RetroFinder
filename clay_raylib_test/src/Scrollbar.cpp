@@ -72,6 +72,9 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
 
     const float tailAxis = CLAY__MAX(trackAxis - thumbAxis - thumbOffset, 0.0f);
 
+    // Generate a unique thumb ID for this scrollbar
+    _thumbElementId = CLAY_IDI("scrollbar_thumb", (_orientation << 16) | (uint32_t)_hasScrollTarget);
+
     _middlePattern.SetPatternStyle(Pattern::PatternStyle::Dots);
     if (vertical) {
         _middlePattern.SetRenderSize((float)_size, trackAxis);
@@ -81,6 +84,52 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
     Control::BoxStyle trackStyle = {};
     _middlePattern.ApplyToStyle(theme, trackStyle);
     _middlePattern.ClearRenderSize();
+
+    // Setup drag handle for thumb interactivity
+    {
+        const bool isVertical = vertical;
+        const float trackSize = trackAxis;
+        const float thumbSize = thumbAxis;
+        const float maxThumbOffset = trackSize - thumbSize;
+        const Clay_ElementId targetId = _scrollTargetId;
+
+        _thumbDragHandle.SetCanStartDragPredicate([this]() {
+            return Clay_PointerOver(_thumbElementId);
+        });
+
+        _thumbDragHandle.SetOnDrag([this, isVertical, trackSize, thumbSize, maxThumbOffset, contentAxis, containerAxis, targetId](
+            Vector2 delta) {
+            // Re-fetch scroll data each frame since we can't capture a local reference
+            Clay_ScrollContainerData currentScrollData = Clay_GetScrollContainerData(targetId);
+            if (!currentScrollData.found || !currentScrollData.scrollPosition) {
+                return;
+            }
+
+            const float dragDelta = isVertical ? delta.y : delta.x;
+            const float maxScroll = contentAxis - containerAxis;
+            if (maxScroll <= 0.0f) {
+                return;
+            }
+
+            const float thumbT = maxThumbOffset > 0.0f ? (dragDelta / maxThumbOffset) : 0.0f;
+            const float scrollDelta = thumbT * maxScroll;
+            const float newScroll = isVertical
+                ? currentScrollData.scrollPosition->y - scrollDelta
+                : currentScrollData.scrollPosition->x - scrollDelta;
+
+            const float minScroll = -maxScroll;
+            const float clampedScroll = CLAY__MAX(CLAY__MIN(newScroll, 0.0f), minScroll);
+
+            if (isVertical) {
+                currentScrollData.scrollPosition->y = clampedScroll;
+            } else {
+                currentScrollData.scrollPosition->x = clampedScroll;
+            }
+        });
+    }
+
+    Vector2 mouseScreenPos = { GetMousePosition().x + GetWindowPosition().x, GetMousePosition().y + GetWindowPosition().y };
+    _thumbDragHandle.Update(mouseScreenPos);
 
     if (vertical) {
         CLAY_AUTO_ID({
@@ -103,7 +152,7 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
                 }) {}
             }
 
-            CLAY_AUTO_ID({
+            CLAY(_thumbElementId, {
                 .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(thumbAxis) } },
                 .backgroundColor = theme->GetBackgroundColor(),
                 .cornerRadius = { 4 },
@@ -140,7 +189,7 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
                 }) {}
             }
 
-            CLAY_AUTO_ID({
+            CLAY(_thumbElementId, {
                 .layout = { .sizing = { .width = CLAY_SIZING_FIXED(thumbAxis), .height = CLAY_SIZING_GROW(0) } },
                 .backgroundColor = theme->GetBackgroundColor(),
                 .cornerRadius = { 4 },

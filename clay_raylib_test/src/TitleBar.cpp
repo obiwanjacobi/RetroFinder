@@ -94,29 +94,23 @@ void TitleBar::DeclareContent(Theme* theme)
     _title.SetBackgroundColor(theme->GetBackgroundColor());
 
     // Window drag: press-and-hold on the pattern area, excluding buttons.
-    bool overDragZone = _pattern.IsPointerOver()
-                        && !_leftButton.IsPointerOver()
-                        && !_rightButton.IsPointerOver();
+    // Setup drag handle with predicate and callback
+    _dragHandle.SetCanStartDragPredicate([this]() {
+        return _pattern.IsPointerOver()
+            && !_leftButton.IsPointerOver()
+            && !_rightButton.IsPointerOver();
+    });
+
+    _dragHandle.SetOnDrag([this](Vector2 delta) {
+        if (_onDrag) {
+            _onDrag(delta);
+        }
+    });
 
     Vector2 windowPos = GetWindowPosition();
     Vector2 mouseLocal = GetMousePosition();
     Vector2 mouseScreen = { windowPos.x + mouseLocal.x, windowPos.y + mouseLocal.y };
-
-    if (overDragZone && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        _isDragging = true;
-        _lastDragMouseScreen = mouseScreen;
-    }
-    if (!IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-        _isDragging = false;
-    }
-    if (_isDragging && _onDrag) {
-        Vector2 delta = {
-            mouseScreen.x - _lastDragMouseScreen.x,
-            mouseScreen.y - _lastDragMouseScreen.y,
-        };
-        _lastDragMouseScreen = mouseScreen;
-        _onDrag(delta);
-    }
+    _dragHandle.Update(mouseScreen);
 
     Panel::DeclareContent(theme);
 }
