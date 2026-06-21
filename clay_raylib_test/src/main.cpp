@@ -21,10 +21,9 @@ int main() {
     g_theme = new Theme();
     g_theme->SetBackgroundColor(CLAY_COLOR_WHITE);
     g_theme->SetForegroundColor(CLAY_COLOR_BLACK);
-    if (!g_theme->LoadFont("./ChicagoFLF.ttf", 16)) {
+    if (!g_theme->LoadFont("./ChicagoFLF.ttf", 48)) {
         TraceLog(LOG_ERROR, "Theme: Failed to load font.");
     }
-    g_theme->SetFontSize(48);
     g_window->SetTheme(g_theme);
 
     auto lblTxt = CLAY_STRING("raylib-clay test application - scroll panel test - long string for horizontal scroll ...");

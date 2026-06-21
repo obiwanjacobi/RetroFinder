@@ -44,7 +44,7 @@ public:
         }
         _font = font;
     }
-    bool LoadFont(const char* fontPath, uint16_t fontSize);
+    bool LoadFont(const char* fontPath, uint16_t fontSize, TextureFilter textureFilter = TextureFilter::TEXTURE_FILTER_POINT);
     
     void SetFontSize(uint16_t fontSize) { _fontSize = fontSize; }
     uint16_t GetFontSize() const { return _fontSize; }
