@@ -13,6 +13,8 @@ public:
     Control(Control&&) = delete;
     Control& operator=(Control&&) = delete;
 
+    const Clay_ElementId& Id() const { return _id; }
+    
     Clay_LayoutConfig& Layout() { return _layout; }
     const Clay_LayoutConfig& Layout() const { return _layout; }
 
@@ -58,15 +60,13 @@ protected:
         Clay_ClipElementConfig clip = {};
     };
 
-    Clay_ElementId Id() const { return _id; }
-
     virtual void Prepare(Theme* theme, BoxStyle& style);
-
     virtual void DeclareContent(Theme* theme) = 0;
 
 private:
     Clay_ElementId _id;
     Clay_LayoutConfig _layout = {};
+    // theme overrides
     Clay_Color _backgroundColor = {0};
     Clay_BorderElementConfig _border = {};
     bool _hasBackgroundColor = false;

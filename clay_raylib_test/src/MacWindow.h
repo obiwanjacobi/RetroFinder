@@ -1,7 +1,7 @@
 #pragma once
 #include "project.h"
-#include "Panel.h"
 #include "PatternPanel.h"
+#include "ScrollPanel.h"
 #include "TitleBar.h"
 #include "Window.h"
 
@@ -16,11 +16,11 @@ public:
     MacWindow(MacWindow&&) = delete;
     MacWindow& operator=(MacWindow&&) = delete;
 
-    Panel& Screen() { return _screen; }
+    ScrollPanel& Screen() { return _screen; }
 
     void Declare(Theme* theme) override;
     
 private:
-    Panel _screen;
+    ScrollPanel _screen;
     TitleBar _titleBar;
 };

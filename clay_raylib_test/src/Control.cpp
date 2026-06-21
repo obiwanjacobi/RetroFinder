@@ -25,7 +25,11 @@ void Control::Declare(Theme* theme) {
             .image = style.image,
             .floating = style.floating,
             .custom = style.custom,
-            .clip = style.clip,
+            .clip = Clay_ClipElementConfig {
+                .horizontal = style.clip.horizontal,
+                .vertical = style.clip.vertical,
+                .childOffset = (style.clip.horizontal || style.clip.vertical) ? Clay_GetScrollOffset() : style.clip.childOffset,
+            },
             .border = style.border,
         }) {
         DeclareContent(theme);

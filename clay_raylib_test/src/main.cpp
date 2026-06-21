@@ -27,9 +27,13 @@ int main() {
     g_theme->SetFontSize(48);
     g_window->SetTheme(g_theme);
 
-    Label lbl;
-    lbl.SetText(CLAY_STRING("raylib-clay test application"));
-    g_window->Screen().Add(&lbl);
+    auto lblTxt = CLAY_STRING("raylib-clay test application - scroll panel test - long string for horizontal scroll ...");
+    for (int i = 0; i < 20; i++)
+    {
+        Label* lbl = new Label(CLAY_IDI("label", i));
+        lbl->SetText(lblTxt);
+        g_window->Screen().Add(lbl);
+    }
 
     while (!g_window->ShouldClose()) {
         g_window->Render();

@@ -20,6 +20,7 @@ const char* ClayStringToCString(Clay_StringSlice str);
 Color ClayColorToRaylibColor(Clay_Color color);
 
 inline Clay_Vector2 RaylibVector2ToClayVector2(Vector2 v) { return { v.x, v.y }; }
+inline Clay_Vector2 RaylibVector2ToClayVector2Scale(Vector2 v, float xScale, float yScale) { return { v.x * xScale, v.y * yScale }; }
 inline Vector2 ClayVector2ToRaylibVector2(Clay_Vector2 v) { return { v.x, v.y }; }
 
 #ifdef __cplusplus
