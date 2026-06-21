@@ -17,6 +17,13 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
         SetPosition((int)roundf(pos.x + delta.x), (int)roundf(pos.y + delta.y));
     });
     
+    _screen.ShowResizeHandle(true);
+    _screen.SetOnResize([this](Vector2 delta) {
+        int width = GetRenderWidth();
+        int height = GetRenderHeight();
+        SetSize(width + (int)roundf(delta.x), height + (int)roundf(delta.y));
+    });
+    
     Window::Screen().Add(&_titleBar);
     Window::Screen().Add(&_screen);
 }

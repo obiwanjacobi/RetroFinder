@@ -13,6 +13,24 @@ void ScrollView::DeclareContent(Theme* theme) {
     const bool showH = _showHorizontalScrollbar;
     const bool reserveCorner = showV && showH;
 
+    // Setup resize handle drag
+    if (_showResizeHandle && reserveCorner) {
+        _resizeHandleElementId = CLAY_IDI("scrollview_resize_handle", Id().id);
+
+        _resizeDragHandle.SetCanStartDragPredicate([this]() {
+            return Clay_PointerOver(_resizeHandleElementId);
+        });
+
+        _resizeDragHandle.SetOnDrag([this](Vector2 delta) {
+            if (_onResize) {
+                _onResize(delta);
+            }
+        });
+
+        Vector2 mouseScreenPos = { GetMousePosition().x + GetWindowPosition().x, GetMousePosition().y + GetWindowPosition().y };
+        _resizeDragHandle.Update(mouseScreenPos);
+    }
+
     // Main container
     CLAY_AUTO_ID({
         .layout = {
@@ -39,7 +57,7 @@ void ScrollView::DeclareContent(Theme* theme) {
         if (showH) {
             CLAY_AUTO_ID({
                 .layout = {
-                    .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(_horizontalScrollbar.GetSize()) },
+                    .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_horizontalScrollbar.GetSize()) },
                     .layoutDirection = CLAY_LEFT_TO_RIGHT
                 }
             }) {
@@ -49,21 +67,21 @@ void ScrollView::DeclareContent(Theme* theme) {
                     CLAY_AUTO_ID({
                         .layout = {
                             .sizing = {
-                                .width = CLAY_SIZING_FIXED(_horizontalScrollbar.GetSize()),
-                                .height = CLAY_SIZING_FIXED(_horizontalScrollbar.GetSize())
+                                .width = CLAY_SIZING_FIXED((float)_horizontalScrollbar.GetSize()),
+                                .height = CLAY_SIZING_FIXED((float)_horizontalScrollbar.GetSize())
                             }
                         },
                         .backgroundColor = theme->GetBackgroundColor()
                     }) {
                         if (_showResizeHandle) {
-                            CLAY_AUTO_ID({
+                            CLAY(_resizeHandleElementId, {
                                 .layout = {
                                     .sizing = {
                                         .width = CLAY_SIZING_GROW(0),
                                         .height = CLAY_SIZING_GROW(0)
                                     }
                                 },
-                                .backgroundColor = theme->GetForegroundColor()
+                                .backgroundColor = theme->GetBackgroundColor()
                             }) {
                                 // Resize handle corner
                             }

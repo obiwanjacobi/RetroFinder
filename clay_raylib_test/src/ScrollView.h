@@ -3,6 +3,9 @@
 #include "ContainerControl.h"
 #include "ScrollPanel.h"
 #include "Scrollbar.h"
+#include "DragHandle.h"
+
+#include <functional>
 
 class ScrollView : public ContainerControl {
 public:
@@ -35,6 +38,10 @@ public:
     void ShowResizeHandle(bool show) { _showResizeHandle = show; }
     bool IsResizeHandleVisible() const { return _showResizeHandle; }
 
+    using ResizeHandler = std::function<void(Vector2 delta)>;
+    void SetOnResize(ResizeHandler handler) { _onResize = std::move(handler); }
+    void ClearOnResize() { _onResize = nullptr; }
+
     // Scrollbar access
     Scrollbar& GetVerticalScrollbar() { return _verticalScrollbar; }
     Scrollbar& GetHorizontalScrollbar() { return _horizontalScrollbar; }
@@ -53,4 +60,7 @@ private:
     bool _showVerticalScrollbar = true;
     bool _showHorizontalScrollbar = true;
     bool _showResizeHandle = false;
+    ResizeHandler _onResize;
+    Clay_ElementId _resizeHandleElementId = {};
+    DragHandle _resizeDragHandle;
 };
