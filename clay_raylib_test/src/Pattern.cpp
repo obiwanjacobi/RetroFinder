@@ -36,13 +36,25 @@ void Pattern::SetPixelScale(uint16_t pixelScale) {
 
 void Pattern::Prepare(Theme* theme, BoxStyle& style) {
     Control::Prepare(theme, style);
+    ApplyToStyle(theme, style);
+}
 
+void Pattern::ApplyToStyle(Theme* theme, BoxStyle& style) {
+    float width = _renderWidth;
+    float height = _renderHeight;
+
+    if (!_hasRenderSizeOverride) {
+        Clay_ElementData patternData = Clay_GetElementData(Id());
+        width = patternData.found ? patternData.boundingBox.width : 0.0f;
+        height = patternData.found ? patternData.boundingBox.height : 0.0f;
+    }
+
+    ApplyPatternForSize(theme, style, width, height);
+}
+
+void Pattern::ApplyPatternForSize(Theme* theme, BoxStyle& style, float width, float height) {
     // Keep background transparent so only the generated pattern is visible.
     style.backgroundColor = Clay_Color { 0 };
-
-    Clay_ElementData patternData = Clay_GetElementData(Id());
-    float width = patternData.found ? patternData.boundingBox.width : 0.0f;
-    float height = patternData.found ? patternData.boundingBox.height : 0.0f;
 
     bool sizeKnown = width > 0.0f && height > 0.0f;
     bool sizeChanged = sizeKnown && (width != _lastWidth || height != _lastHeight);

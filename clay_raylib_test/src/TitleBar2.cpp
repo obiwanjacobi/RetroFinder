@@ -14,7 +14,6 @@ TitleBar2::TitleBar2(Clay_ElementId id) : Panel(id),
     _patternRight(CLAY_ID("titlebar2_pattern_right"))
 {
     _leftButton.SetText(CLAY_STRING("-"));
-    _rightButton.SetText(CLAY_STRING("X"));
 
     Add(&_patternLeft);
     Add(&_leftButtonGapOuter);

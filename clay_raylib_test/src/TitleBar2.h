@@ -10,6 +10,7 @@
 
 #include <functional>
 
+// simpler row layout, more objects, more memory
 class TitleBar2 : public Panel {
 public:
     TitleBar2() : TitleBar2(CLAY_ID("titlebar2")) {}

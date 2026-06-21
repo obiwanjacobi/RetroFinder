@@ -25,14 +25,30 @@ public:
     void SetPixelScale(uint16_t pixelScale);
     uint16_t GetPixelScale() const { return _pixelScale; }
 
+    // Allows container controls to reuse Pattern's rendering behavior when they
+    // need to apply the pattern to their own style.
+    void SetRenderSize(float width, float height) {
+        _renderWidth = width;
+        _renderHeight = height;
+        _hasRenderSizeOverride = true;
+    }
+    void ClearRenderSize() { _hasRenderSizeOverride = false; }
+    void ApplyToStyle(Theme* theme, BoxStyle& style);
+
 protected:
     void Prepare(Theme* theme, BoxStyle& style) override;
     void DeclareContent(Theme* theme) override;
 
 private:
+    void ApplyPatternForSize(Theme* theme, BoxStyle& style, float width, float height);
+
     PatternStyle _patternStyle = PatternStyle::Dots;
     uint16_t _tileSize = 8;
     uint16_t _pixelScale = 3;
+
+    float _renderWidth = 0.0f;
+    float _renderHeight = 0.0f;
+    bool _hasRenderSizeOverride = false;
 
     Image _tileImage = {0};
     Texture2D _tileTexture = {0};

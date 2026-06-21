@@ -2,7 +2,7 @@
 #include "project.h"
 #include "Panel.h"
 #include "PatternPanel.h"
-#include "TitleBar2.h"
+#include "TitleBar.h"
 #include "Window.h"
 
 class MacWindow : public Window
@@ -22,5 +22,5 @@ public:
     
 private:
     Panel _screen;
-    TitleBar2 _titleBar;
+    TitleBar _titleBar;
 };

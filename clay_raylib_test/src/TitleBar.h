@@ -10,6 +10,7 @@
 
 #include <functional>
 
+// floating button layout, more efficient pattern usage
 class TitleBar : public Panel {
 public:
     TitleBar() : TitleBar(CLAY_ID("titlebar")) {}
