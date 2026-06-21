@@ -54,6 +54,6 @@ private:
     Texture2D _tileTexture = {0};
     bool _tileTextureLoaded = false;
     bool _tileDirty = true;
-    float _lastWidth = 0.0f;
-    float _lastHeight = 0.0f;
+    int _lastTextureWidth = 0;
+    int _lastTextureHeight = 0;
 };

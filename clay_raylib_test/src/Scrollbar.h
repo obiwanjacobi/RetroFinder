@@ -46,7 +46,7 @@ protected:
 
 private:
     Orientation _orientation;
-    uint32_t _size = 36;
+    uint32_t _size = 48;
     float _thumbPercent = 1.0f;
     Clay_ElementId _scrollTargetId = {};
     bool _hasScrollTarget = false;

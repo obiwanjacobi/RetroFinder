@@ -57,9 +57,24 @@ void Pattern::ApplyPatternForSize(Theme* theme, BoxStyle& style, float width, fl
     style.backgroundColor = Clay_Color { 0 };
 
     bool sizeKnown = width > 0.0f && height > 0.0f;
-    bool sizeChanged = sizeKnown && (width != _lastWidth || height != _lastHeight);
+    int textureWidth = 1;
+    int textureHeight = 1;
+    uint16_t textureTileSize = 1;
 
-    if (sizeKnown && (_tileDirty || sizeChanged)) {
+    if (sizeKnown) {
+        textureWidth = CLAY__MAX(1, (int)width / (int)_pixelScale);
+        textureHeight = CLAY__MAX(1, (int)height / (int)_pixelScale);
+        textureTileSize = (uint16_t)CLAY__MAX(1, (int)_tileSize / (int)_pixelScale);
+    }
+
+    const bool textureCapacityExceeded = sizeKnown
+        && (textureWidth > _lastTextureWidth || textureHeight > _lastTextureHeight);
+
+    // Grow-only cache: never shrink cached texture on small resize changes.
+    const int generateWidth = CLAY__MAX(textureWidth, _lastTextureWidth);
+    const int generateHeight = CLAY__MAX(textureHeight, _lastTextureHeight);
+
+    if (sizeKnown && (_tileDirty || textureCapacityExceeded)) {
         if (IsImageValid(_tileImage)) {
             UnloadImage(_tileImage);
         }
@@ -69,13 +84,9 @@ void Pattern::ApplyPatternForSize(Theme* theme, BoxStyle& style, float width, fl
             _tileTextureLoaded = false;
         }
 
-        int textureWidth = CLAY__MAX(1, (int)width / (int)_pixelScale);
-        int textureHeight = CLAY__MAX(1, (int)height / (int)_pixelScale);
-        uint16_t textureTileSize = (uint16_t)CLAY__MAX(1, (int)_tileSize / (int)_pixelScale);
-
         _tileImage = PatternTileGenerator::GenerateTiled(
-            textureWidth,
-            textureHeight,
+            generateWidth,
+            generateHeight,
             _patternStyle,
             textureTileSize,
             theme->GetBackgroundColor(),
@@ -87,8 +98,8 @@ void Pattern::ApplyPatternForSize(Theme* theme, BoxStyle& style, float width, fl
             SetTextureFilter(_tileTexture, TEXTURE_FILTER_POINT);
         }
 
-        _lastWidth = width;
-        _lastHeight = height;
+        _lastTextureWidth = generateWidth;
+        _lastTextureHeight = generateHeight;
         _tileDirty = false;
     }
 
