@@ -9,6 +9,8 @@ void IconButton::ClearIcon() {
 }
 
 void IconButton::DeclareContent(Theme* theme) {
+    Button::DeclareContent(theme);
+
     if (_icon.HasIcon()) {
         CLAY_AUTO_ID({
             .layout = {
@@ -25,6 +27,4 @@ void IconButton::DeclareContent(Theme* theme) {
         }
         return;
     }
-
-    Button::DeclareContent(theme);
 }

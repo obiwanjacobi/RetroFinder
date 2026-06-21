@@ -11,6 +11,29 @@ void Scrollbar::DeclareVerticalScrollbar(Theme* theme)
     Layout().sizing = { .width = CLAY_SIZING_FIXED((float)_size), .height = CLAY_SIZING_GROW(0) };
     Layout().layoutDirection = CLAY_TOP_TO_BOTTOM;
 
+    if (_hasScrollTarget) {
+        const Clay_ElementId targetId = _scrollTargetId;
+        const float step = (float)_size;
+
+        _startButton.SetOnClick([targetId, step]() {
+            Clay_ScrollContainerData data = Clay_GetScrollContainerData(targetId);
+            if (data.found && data.scrollPosition) {
+                const float maxScroll = data.contentDimensions.height - data.scrollContainerDimensions.height;
+                if (maxScroll <= 0.0f) return;
+                data.scrollPosition->y = CLAY__MIN(0.0f, data.scrollPosition->y + step);
+            }
+        });
+
+        _endButton.SetOnClick([targetId, step]() {
+            Clay_ScrollContainerData data = Clay_GetScrollContainerData(targetId);
+            if (data.found && data.scrollPosition) {
+                const float maxScroll = data.contentDimensions.height - data.scrollContainerDimensions.height;
+                if (maxScroll <= 0.0f) return;
+                data.scrollPosition->y = CLAY__MAX(-(maxScroll), data.scrollPosition->y - step);
+            }
+        });
+    }
+
     _startButton.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_size) };
     _startButton.SetIcon(IconButton::IconType::ArrowUp, kIconSize, kIconScale);
     _startButton.Declare(theme);
@@ -26,6 +49,29 @@ void Scrollbar::DeclareHorizontalScrollbar(Theme* theme)
 {
     Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_size) };
     Layout().layoutDirection = CLAY_LEFT_TO_RIGHT;
+
+    if (_hasScrollTarget) {
+        const Clay_ElementId targetId = _scrollTargetId;
+        const float step = (float)_size;
+
+        _startButton.SetOnClick([targetId, step]() {
+            Clay_ScrollContainerData data = Clay_GetScrollContainerData(targetId);
+            if (data.found && data.scrollPosition) {
+                const float maxScroll = data.contentDimensions.width - data.scrollContainerDimensions.width;
+                if (maxScroll <= 0.0f) return;
+                data.scrollPosition->x = CLAY__MIN(0.0f, data.scrollPosition->x + step);
+            }
+        });
+
+        _endButton.SetOnClick([targetId, step]() {
+            Clay_ScrollContainerData data = Clay_GetScrollContainerData(targetId);
+            if (data.found && data.scrollPosition) {
+                const float maxScroll = data.contentDimensions.width - data.scrollContainerDimensions.width;
+                if (maxScroll <= 0.0f) return;
+                data.scrollPosition->x = CLAY__MAX(-(maxScroll), data.scrollPosition->x - step);
+            }
+        });
+    }
 
     _startButton.Layout().sizing = { .width = CLAY_SIZING_FIXED((float)_size), .height = CLAY_SIZING_GROW(0) };
     _startButton.SetIcon(IconButton::IconType::ArrowLeft, kIconSize, kIconScale);
@@ -87,8 +133,9 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme)
     _thumbPercent = trackAxis > 0.0f ? (thumbAxis / trackAxis) : 1.0f;
     _thumbPercent = CLAY__MAX(0.0f, CLAY__MIN(_thumbPercent, 1.0f));
 
-    // Generate a unique thumb ID for this scrollbar
+    // Generate unique element IDs for this scrollbar
     _thumbElementId = CLAY_IDI("scrollbar_thumb", (_orientation << 16) | (uint32_t)_hasScrollTarget);
+    _trackElementId = CLAY_IDI("scrollbar_track", (_orientation << 16) | (uint32_t)_hasScrollTarget);
 
     _middlePattern.SetPatternStyle(Pattern::PatternStyle::Dots);
     if (vertical) {
@@ -155,7 +202,7 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme)
 
 void Scrollbar::DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle)
 {
-    CLAY_AUTO_ID({
+    CLAY(_trackElementId, {
         .layout = {
             .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
             .layoutDirection = CLAY_TOP_TO_BOTTOM
@@ -169,6 +216,10 @@ void Scrollbar::DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, floa
             .width = CLAY_BORDER_OUTSIDE(2)
         }
     }) {
+        if (_hasScrollTarget) {
+            Clay_OnHover(OnTrackClickCallback, this);
+        }
+
         if (thumbOffset > 0.0f) {
             CLAY_AUTO_ID({
                 .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(thumbOffset) } }
@@ -197,7 +248,7 @@ void Scrollbar::DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, floa
 
 void Scrollbar::DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle)
 {
-    CLAY_AUTO_ID({
+    CLAY(_trackElementId, {
         .layout = {
             .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
             .layoutDirection = CLAY_LEFT_TO_RIGHT
@@ -211,6 +262,10 @@ void Scrollbar::DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, fl
             .width = CLAY_BORDER_OUTSIDE(2)
         }
     }) {
+        if (_hasScrollTarget) {
+            Clay_OnHover(OnTrackClickCallback, this);
+        }
+
         if (thumbOffset > 0.0f) {
             CLAY_AUTO_ID({
                 .layout = { .sizing = { .width = CLAY_SIZING_FIXED(thumbOffset), .height = CLAY_SIZING_GROW(0) } }
@@ -236,3 +291,43 @@ void Scrollbar::DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, fl
         }
     }
 }
+
+void Scrollbar::OnTrackClickCallback(Clay_ElementId elementId, Clay_PointerData pointerData, void* userData)
+{
+    if (pointerData.state != CLAY_POINTER_DATA_PRESSED_THIS_FRAME) return;
+
+    Scrollbar* self = static_cast<Scrollbar*>(userData);
+    if (elementId.id != self->_trackElementId.id) return;
+
+    // Let the thumb drag handle its own interaction
+    if (Clay_PointerOver(self->_thumbElementId)) return;
+
+    Clay_ElementData trackData = Clay_GetElementData(self->_trackElementId);
+    Clay_ElementData thumbData = Clay_GetElementData(self->_thumbElementId);
+    if (!trackData.found || !thumbData.found) return;
+
+    Clay_ScrollContainerData scrollData = Clay_GetScrollContainerData(self->_scrollTargetId);
+    if (!scrollData.found || !scrollData.scrollPosition) return;
+
+    const bool isVertical = (self->_orientation == VERTICAL);
+    const float contentAxis   = isVertical ? scrollData.contentDimensions.height        : scrollData.contentDimensions.width;
+    const float containerAxis = isVertical ? scrollData.scrollContainerDimensions.height : scrollData.scrollContainerDimensions.width;
+    const float maxScroll = contentAxis - containerAxis;
+    if (maxScroll <= 0.0f) return;
+
+    const float trackStart = isVertical ? trackData.boundingBox.y      : trackData.boundingBox.x;
+    const float trackSize  = isVertical ? trackData.boundingBox.height  : trackData.boundingBox.width;
+    const float thumbSize  = isVertical ? thumbData.boundingBox.height  : thumbData.boundingBox.width;
+    const float mousePos   = isVertical ? pointerData.position.y        : pointerData.position.x;
+
+    // Center the thumb on the click position
+    const float clickRelative = mousePos - trackStart - thumbSize * 0.5f;
+    const float scrollT = CLAY__MAX(0.0f, CLAY__MIN(1.0f, clickRelative / (trackSize - thumbSize)));
+
+    if (isVertical) {
+        scrollData.scrollPosition->y = -(scrollT * maxScroll);
+    } else {
+        scrollData.scrollPosition->x = -(scrollT * maxScroll);
+    }
+}
+

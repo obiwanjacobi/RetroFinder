@@ -51,6 +51,7 @@ private:
     Clay_ElementId _scrollTargetId = {};
     bool _hasScrollTarget = false;
     Clay_ElementId _thumbElementId = {};
+    Clay_ElementId _trackElementId = {};
     DragHandle _thumbDragHandle;
     IconButton _startButton;
     IconButton _endButton;
@@ -61,4 +62,6 @@ private:
     void DeclareTrackAndThumb(Theme* theme);
     void DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle);
     void DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle);
+
+    static void OnTrackClickCallback(Clay_ElementId elementId, Clay_PointerData pointerData, void* userData);
 };
