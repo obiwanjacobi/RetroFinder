@@ -156,7 +156,7 @@ function Invoke-GnuStyleBuild {
 
     $compileArgs = @('-std=c++20')
     if ($Release) {
-        $compileArgs += @('-O3', '-DNDEBUG')
+        $compileArgs += @('-O3', '-DNDEBUG', '-mwindows')
     } else {
         $compileArgs += @('-g3', '-O0', '-fno-omit-frame-pointer')
     }
@@ -218,7 +218,7 @@ switch ($compilerName) {
         }
 
         if ($Release) {
-            $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/O2', '/DNDEBUG', "/Fe:$outputPath")
+            $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/O2', '/DNDEBUG', '/SUBSYSTEM:WINDOWS', "/Fe:$outputPath")
         } else {
             $clArgs = @('/nologo', '/EHsc', '/std:c++20', '/Zi', '/Od', "/Fe:$outputPath")
         }
