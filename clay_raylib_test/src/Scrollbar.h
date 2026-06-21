@@ -56,5 +56,7 @@ private:
 
     void DeclareVerticalScrollbar(Theme* theme);
     void DeclareHorizontalScrollbar(Theme* theme);
-    void DeclareTrackAndThumb(Theme* theme, bool vertical);
+    void DeclareTrackAndThumb(Theme* theme);
+    void DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle);
+    void DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle);
 };

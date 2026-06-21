@@ -13,7 +13,7 @@ void Scrollbar::DeclareVerticalScrollbar(Theme* theme)
     _startButton.SetText(CLAY_STRING("^"));
     _startButton.Declare(theme);
 
-    DeclareTrackAndThumb(theme, true);
+    DeclareTrackAndThumb(theme);
 
     _endButton.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_size) };
     _endButton.SetText(CLAY_STRING("v"));
@@ -29,19 +29,29 @@ void Scrollbar::DeclareHorizontalScrollbar(Theme* theme)
     _startButton.SetText(CLAY_STRING("<"));
     _startButton.Declare(theme);
 
-    DeclareTrackAndThumb(theme, false);
+    DeclareTrackAndThumb(theme);
 
     _endButton.Layout().sizing = { .width = CLAY_SIZING_FIXED((float)_size), .height = CLAY_SIZING_GROW(0) };
     _endButton.SetText(CLAY_STRING(">"));
     _endButton.Declare(theme);
 }
 
-void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
+void Scrollbar::DeclareTrackAndThumb(Theme* theme)
 {
-    Clay_ScrollContainerData scrollData = {};
-    if (_hasScrollTarget) {
-        scrollData = Clay_GetScrollContainerData(_scrollTargetId);
+    bool vertical = _orientation == VERTICAL;
+
+    // If no scroll target, render empty track without thumb
+    if (!_hasScrollTarget) {
+        Control::BoxStyle trackStyle = {};
+        if (vertical) {
+            DeclareVerticalTrackAndThumb(theme, (float)_size, (float)_size, 0.0f, 0.0f, trackStyle);
+        } else {
+            DeclareHorizontalTrackAndThumb(theme, (float)_size, (float)_size, 0.0f, 0.0f, trackStyle);
+        }
+        return;
     }
+
+    Clay_ScrollContainerData scrollData = Clay_GetScrollContainerData(_scrollTargetId);
 
     const float containerAxis = vertical
         ? scrollData.scrollContainerDimensions.height
@@ -132,26 +142,35 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
     _thumbDragHandle.Update(mouseScreenPos);
 
     if (vertical) {
-        CLAY_AUTO_ID({
-            .layout = {
-                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
-                .layoutDirection = CLAY_TOP_TO_BOTTOM
-            },
-            .backgroundColor = trackStyle.backgroundColor,
-            .cornerRadius = { 4 },
-            .image = trackStyle.image,
-            .clip = trackStyle.clip,
-            .border = {
-                .color = theme->GetForegroundColor(),
-                .width = CLAY_BORDER_OUTSIDE(2)
-            }
-        }) {
-            if (thumbOffset > 0.0f) {
-                CLAY_AUTO_ID({
-                    .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(thumbOffset) } }
-                }) {}
-            }
+        DeclareVerticalTrackAndThumb(theme, trackAxis, thumbAxis, thumbOffset, tailAxis, trackStyle);
+    } else {
+        DeclareHorizontalTrackAndThumb(theme, trackAxis, thumbAxis, thumbOffset, tailAxis, trackStyle);
+    }
+}
 
+void Scrollbar::DeclareVerticalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle)
+{
+    CLAY_AUTO_ID({
+        .layout = {
+            .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
+            .layoutDirection = CLAY_TOP_TO_BOTTOM
+        },
+        .backgroundColor = trackStyle.backgroundColor,
+        .cornerRadius = { 4 },
+        .image = trackStyle.image,
+        .clip = trackStyle.clip,
+        .border = {
+            .color = theme->GetForegroundColor(),
+            .width = CLAY_BORDER_OUTSIDE(2)
+        }
+    }) {
+        if (thumbOffset > 0.0f) {
+            CLAY_AUTO_ID({
+                .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(thumbOffset) } }
+            }) {}
+        }
+
+        if (_hasScrollTarget) {
             CLAY(_thumbElementId, {
                 .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(thumbAxis) } },
                 .backgroundColor = theme->GetBackgroundColor(),
@@ -161,34 +180,39 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
                     .width = CLAY_BORDER_OUTSIDE(2)
                 }
             }) {}
-
-            if (tailAxis > 0.0f) {
-                CLAY_AUTO_ID({
-                    .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(tailAxis) } }
-                }) {}
-            }
         }
-    } else {
-        CLAY_AUTO_ID({
-            .layout = {
-                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
-                .layoutDirection = CLAY_LEFT_TO_RIGHT
-            },
-            .backgroundColor = trackStyle.backgroundColor,
-            .cornerRadius = { 4 },
-            .image = trackStyle.image,
-            .clip = trackStyle.clip,
-            .border = {
-                .color = theme->GetForegroundColor(),
-                .width = CLAY_BORDER_OUTSIDE(2)
-            }
-        }) {
-            if (thumbOffset > 0.0f) {
-                CLAY_AUTO_ID({
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(thumbOffset), .height = CLAY_SIZING_GROW(0) } }
-                }) {}
-            }
 
+        if (tailAxis > 0.0f) {
+            CLAY_AUTO_ID({
+                .layout = { .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(tailAxis) } }
+            }) {}
+        }
+    }
+}
+
+void Scrollbar::DeclareHorizontalTrackAndThumb(Theme* theme, float trackAxis, float thumbAxis, float thumbOffset, float tailAxis, const Control::BoxStyle& trackStyle)
+{
+    CLAY_AUTO_ID({
+        .layout = {
+            .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },
+            .layoutDirection = CLAY_LEFT_TO_RIGHT
+        },
+        .backgroundColor = trackStyle.backgroundColor,
+        .cornerRadius = { 4 },
+        .image = trackStyle.image,
+        .clip = trackStyle.clip,
+        .border = {
+            .color = theme->GetForegroundColor(),
+            .width = CLAY_BORDER_OUTSIDE(2)
+        }
+    }) {
+        if (thumbOffset > 0.0f) {
+            CLAY_AUTO_ID({
+                .layout = { .sizing = { .width = CLAY_SIZING_FIXED(thumbOffset), .height = CLAY_SIZING_GROW(0) } }
+            }) {}
+        }
+
+        if (_hasScrollTarget) {
             CLAY(_thumbElementId, {
                 .layout = { .sizing = { .width = CLAY_SIZING_FIXED(thumbAxis), .height = CLAY_SIZING_GROW(0) } },
                 .backgroundColor = theme->GetBackgroundColor(),
@@ -198,12 +222,12 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme, bool vertical)
                     .width = CLAY_BORDER_OUTSIDE(2)
                 }
             }) {}
+        }
 
-            if (tailAxis > 0.0f) {
-                CLAY_AUTO_ID({
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(tailAxis), .height = CLAY_SIZING_GROW(0) } }
-                }) {}
-            }
+        if (tailAxis > 0.0f) {
+            CLAY_AUTO_ID({
+                .layout = { .sizing = { .width = CLAY_SIZING_FIXED(tailAxis), .height = CLAY_SIZING_GROW(0) } }
+            }) {}
         }
     }
 }
