@@ -4,6 +4,7 @@
 #include "ScrollPanel.h"
 #include "Scrollbar.h"
 #include "DragHandle.h"
+#include "Icon.h"
 
 #include <functional>
 
@@ -13,7 +14,8 @@ public:
     explicit ScrollView(Clay_ElementId id) : ContainerControl(id), 
         _scrollPanel(CLAY_IDI("scrollpanel_inner", 0)),
         _verticalScrollbar(Scrollbar::VERTICAL, CLAY_IDI("vscrollbar", 0)),
-        _horizontalScrollbar(Scrollbar::HORIZONTAL, CLAY_IDI("hscrollbar", 0)) {
+        _horizontalScrollbar(Scrollbar::HORIZONTAL, CLAY_IDI("hscrollbar", 0)),
+        _resizeIcon(CLAY_IDI("scrollview_resize_icon", id.id)) {
         _verticalScrollbar.SetScrollTarget(_scrollPanel.Id());
         _horizontalScrollbar.SetScrollTarget(_scrollPanel.Id());
     }
@@ -60,6 +62,7 @@ private:
     ScrollPanel _scrollPanel;
     Scrollbar _verticalScrollbar;
     Scrollbar _horizontalScrollbar;
+    Icon _resizeIcon;
     bool _showVerticalScrollbar = true;
     bool _showHorizontalScrollbar = true;
     bool _showResizeHandle = false;

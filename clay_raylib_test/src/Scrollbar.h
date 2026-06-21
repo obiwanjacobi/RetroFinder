@@ -2,7 +2,7 @@
 #include "project.h"
 #include "Control.h"
 #include "Theme.h"
-#include "Button.h"
+#include "IconButton.h"
 #include "Pattern.h"
 #include "DragHandle.h"
 
@@ -52,8 +52,8 @@ private:
     bool _hasScrollTarget = false;
     Clay_ElementId _thumbElementId = {};
     DragHandle _thumbDragHandle;
-    Button _startButton;
-    Button _endButton;
+    IconButton _startButton;
+    IconButton _endButton;
     Pattern _middlePattern;
 
     void DeclareVerticalScrollbar(Theme* theme);

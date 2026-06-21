@@ -9,6 +9,8 @@ void ScrollView::Prepare(Theme* theme, BoxStyle& style) {
 }
 
 void ScrollView::DeclareContent(Theme* theme) {
+    _resizeIcon.SetIcon(Icon::IconType::ResizeHandle, 15, 3);
+
     const bool showV = _showVerticalScrollbar;
     const bool showH = _showHorizontalScrollbar;
     const bool reserveCorner = showV && showH;
@@ -104,7 +106,11 @@ void ScrollView::DeclareContent(Theme* theme) {
                                 },
                                 .backgroundColor = theme->GetBackgroundColor()
                             }) {
-                                // Resize handle corner
+                                _resizeIcon.Layout().sizing = {
+                                    .width = CLAY_SIZING_GROW(0),
+                                    .height = CLAY_SIZING_GROW(0)
+                                };
+                                _resizeIcon.Declare(theme);
                             }
                         }
                     }
