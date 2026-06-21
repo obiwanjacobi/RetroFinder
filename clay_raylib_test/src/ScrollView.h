@@ -1,0 +1,56 @@
+#pragma once
+#include "project.h"
+#include "ContainerControl.h"
+#include "ScrollPanel.h"
+#include "Scrollbar.h"
+
+class ScrollView : public ContainerControl {
+public:
+    ScrollView() : ScrollView(CLAY_ID("scrollview")) {}
+    explicit ScrollView(Clay_ElementId id) : ContainerControl(id), 
+        _scrollPanel(CLAY_IDI("scrollpanel_inner", 0)),
+        _verticalScrollbar(Scrollbar::VERTICAL, CLAY_IDI("vscrollbar", 0)),
+        _horizontalScrollbar(Scrollbar::HORIZONTAL, CLAY_IDI("hscrollbar", 0)) {
+        _verticalScrollbar.SetScrollTarget(_scrollPanel.Id());
+        _horizontalScrollbar.SetScrollTarget(_scrollPanel.Id());
+    }
+    ~ScrollView() = default;
+
+    ScrollView(const ScrollView&) = delete;
+    ScrollView& operator=(const ScrollView&) = delete;
+    ScrollView(ScrollView&&) = delete;
+    ScrollView& operator=(ScrollView&&) = delete;
+
+    // Add child controls to the scroll panel content area
+    void Add(Control* control) { _scrollPanel.Add(control); }
+    void Remove(Control* control) { _scrollPanel.Remove(control); }
+
+    // Scrollbar visibility
+    void ShowVerticalScrollbar(bool show) { _showVerticalScrollbar = show; }
+    void ShowHorizontalScrollbar(bool show) { _showHorizontalScrollbar = show; }
+    bool IsVerticalScrollbarVisible() const { return _showVerticalScrollbar; }
+    bool IsHorizontalScrollbarVisible() const { return _showHorizontalScrollbar; }
+
+    // Resize handle
+    void ShowResizeHandle(bool show) { _showResizeHandle = show; }
+    bool IsResizeHandleVisible() const { return _showResizeHandle; }
+
+    // Scrollbar access
+    Scrollbar& GetVerticalScrollbar() { return _verticalScrollbar; }
+    Scrollbar& GetHorizontalScrollbar() { return _horizontalScrollbar; }
+
+    ScrollPanel& GetScrollPanel() { return _scrollPanel; }
+    const ScrollPanel& GetScrollPanel() const { return _scrollPanel; }
+
+protected:
+    void Prepare(Theme* theme, BoxStyle& style) override;
+    void DeclareContent(Theme* theme) override;
+
+private:
+    ScrollPanel _scrollPanel;
+    Scrollbar _verticalScrollbar;
+    Scrollbar _horizontalScrollbar;
+    bool _showVerticalScrollbar = true;
+    bool _showHorizontalScrollbar = true;
+    bool _showResizeHandle = false;
+};
