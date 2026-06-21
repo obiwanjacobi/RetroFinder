@@ -19,8 +19,6 @@ int main() {
     SetTargetFPS(60);
 
     g_theme = new Theme();
-    g_theme->SetBackgroundColor(CLAY_COLOR_WHITE);
-    g_theme->SetForegroundColor(CLAY_COLOR_BLACK);
     if (!g_theme->LoadFont("./ChicagoFLF.ttf", 48)) {
         TraceLog(LOG_ERROR, "Theme: Failed to load font.");
     }
