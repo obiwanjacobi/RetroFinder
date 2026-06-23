@@ -7,12 +7,11 @@ void Control::Prepare(Theme* theme, BoxStyle& style)
     } else {
         style.backgroundColor = theme->GetBackgroundColor();
     }
-    if (_hasBorder) {
-        style.border = _border;
-    }
+    style.border = _border;
 }
 
-void Control::Declare(Theme* theme) {
+void Control::Declare(Theme* theme)
+{
     BoxStyle style = {};
     Prepare(theme, style);
 

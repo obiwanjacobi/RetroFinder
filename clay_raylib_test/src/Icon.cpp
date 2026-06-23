@@ -11,10 +11,7 @@ Icon::~Icon() {
     }
 }
 
-void Icon::SetIcon(IconType icon, uint16_t logicalSize, uint16_t pixelScale) {
-    if (logicalSize == 0) {
-        logicalSize = 1;
-    }
+void Icon::SetIcon(IconType icon, uint16_t pixelScale) {
     if (pixelScale == 0) {
         pixelScale = 1;
     }
@@ -22,12 +19,10 @@ void Icon::SetIcon(IconType icon, uint16_t logicalSize, uint16_t pixelScale) {
     const bool changed =
         !_hasIcon ||
         _iconType != icon ||
-        _iconLogicalSize != logicalSize ||
         _iconPixelScale != pixelScale;
 
     _hasIcon = true;
     _iconType = icon;
-    _iconLogicalSize = logicalSize;
     _iconPixelScale = pixelScale;
 
     if (changed) {
@@ -51,7 +46,6 @@ void Icon::RebuildTexture(const Clay_Color& foregroundColor, const Clay_Color& b
 
     _iconImage = PixelIconGenerator::Generate(
         _iconType,
-        _iconLogicalSize,
         _iconPixelScale,
         foregroundColor,
         backgroundColor
@@ -89,14 +83,5 @@ void Icon::ApplyToStyle(Theme* theme, BoxStyle& style) {
 
 void Icon::Prepare(Theme* theme, BoxStyle& style) {
     Control::Prepare(theme, style);
-
-    if (!HasBackgroundColor()) {
-        style.backgroundColor = theme->GetBackgroundColor();
-    }
-
     ApplyToStyle(theme, style);
-}
-
-void Icon::DeclareContent(Theme* theme) {
-    (void)theme;
 }

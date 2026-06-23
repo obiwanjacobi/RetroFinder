@@ -12,7 +12,4 @@ public:
     Panel& operator=(const Panel&) = delete;
     Panel(Panel&&) = delete;
     Panel& operator=(Panel&&) = delete;
-
-protected:
-    void Prepare(Theme* theme, BoxStyle& style) override;
 };

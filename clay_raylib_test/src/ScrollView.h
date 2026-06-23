@@ -55,7 +55,6 @@ public:
     const ScrollPanel& GetScrollPanel() const { return _scrollPanel; }
 
 protected:
-    void Prepare(Theme* theme, BoxStyle& style) override;
     void DeclareContent(Theme* theme) override;
 
 private:

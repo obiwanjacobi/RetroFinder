@@ -18,6 +18,8 @@ public:
     Clay_LayoutConfig& Layout() { return _layout; }
     const Clay_LayoutConfig& Layout() const { return _layout; }
 
+    Clay_BorderElementConfig& Border() { return _border; }
+
     void SetBackgroundColor(Clay_Color color) {
         _backgroundColor = color;
         _hasBackgroundColor = true;
@@ -28,17 +30,6 @@ public:
     }
     bool HasBackgroundColor() const { return _hasBackgroundColor; }
     const Clay_Color& GetBackgroundColor() const { return _backgroundColor; }
-
-    void SetBorder(Clay_BorderElementConfig border) {
-        _border = border;
-        _hasBorder = true;
-    }
-    void ClearBorder() {
-        _border = Clay_BorderElementConfig {};
-        _hasBorder = false;
-    }
-    bool HasBorder() const { return _hasBorder; }
-    const Clay_BorderElementConfig& GetBorder() const { return _border; }
 
     void Declare(Theme* theme);
 
@@ -66,9 +57,8 @@ protected:
 private:
     Clay_ElementId _id;
     Clay_LayoutConfig _layout = {};
+    Clay_BorderElementConfig _border = {};
     // theme overrides
     Clay_Color _backgroundColor = {0};
-    Clay_BorderElementConfig _border = {};
     bool _hasBackgroundColor = false;
-    bool _hasBorder = false;
 };

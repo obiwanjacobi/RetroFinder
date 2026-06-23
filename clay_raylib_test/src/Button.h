@@ -27,7 +27,6 @@ public:
     bool HasOnClick() { return _onClick != nullptr; }
 
 protected:
-    void Prepare(Theme* theme, BoxStyle& style) override;
     void DeclareContent(Theme* theme) override;
 
 private:

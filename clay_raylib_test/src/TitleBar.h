@@ -57,8 +57,6 @@ private:
     Button _leftButton;
     Button _rightButton;
     FloatingPanel _rightEdge;
-    Spacer _leftGap;
-    Spacer _rightGap;
     Label _title;
 
     DragHandler _onDrag;

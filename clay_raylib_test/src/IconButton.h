@@ -23,7 +23,7 @@ public:
     IconButton(IconButton&&) = delete;
     IconButton& operator=(IconButton&&) = delete;
 
-    void SetIcon(IconType icon, uint16_t logicalSize = 15, uint16_t pixelScale = 1);
+    void SetIcon(IconType icon, uint16_t pixelScale = 1);
     void ClearIcon();
     bool HasIcon() const { return _icon.HasIcon(); }
 

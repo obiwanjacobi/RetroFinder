@@ -3,7 +3,6 @@
 namespace {
 constexpr float kMinThumbSize = 18.0f;
 constexpr uint16_t kIconScale = 3;
-constexpr uint16_t kIconSize = 15;
 }
 
 void Scrollbar::DeclareVerticalScrollbar(Theme* theme)
@@ -35,13 +34,13 @@ void Scrollbar::DeclareVerticalScrollbar(Theme* theme)
     }
 
     _startButton.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_size) };
-    _startButton.SetIcon(IconButton::IconType::ArrowUp, kIconSize, kIconScale);
+    _startButton.SetIcon(IconButton::IconType::ArrowUp, kIconScale);
     _startButton.Declare(theme);
 
     DeclareTrackAndThumb(theme);
 
     _endButton.Layout().sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED((float)_size) };
-    _endButton.SetIcon(IconButton::IconType::ArrowDown, kIconSize, kIconScale);
+    _endButton.SetIcon(IconButton::IconType::ArrowDown, kIconScale);
     _endButton.Declare(theme);
 }
 
@@ -74,13 +73,13 @@ void Scrollbar::DeclareHorizontalScrollbar(Theme* theme)
     }
 
     _startButton.Layout().sizing = { .width = CLAY_SIZING_FIXED((float)_size), .height = CLAY_SIZING_GROW(0) };
-    _startButton.SetIcon(IconButton::IconType::ArrowLeft, kIconSize, kIconScale);
+    _startButton.SetIcon(IconButton::IconType::ArrowLeft, kIconScale);
     _startButton.Declare(theme);
 
     DeclareTrackAndThumb(theme);
 
     _endButton.Layout().sizing = { .width = CLAY_SIZING_FIXED((float)_size), .height = CLAY_SIZING_GROW(0) };
-    _endButton.SetIcon(IconButton::IconType::ArrowRight, kIconSize, kIconScale);
+    _endButton.SetIcon(IconButton::IconType::ArrowRight, kIconScale);
     _endButton.Declare(theme);
 }
 

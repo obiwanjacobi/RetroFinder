@@ -16,7 +16,7 @@ public:
     Icon(Icon&&) = delete;
     Icon& operator=(Icon&&) = delete;
 
-    void SetIcon(IconType icon, uint16_t logicalSize = 15, uint16_t pixelScale = 1);
+    void SetIcon(IconType icon, uint16_t pixelScale = 1);
     void ClearIcon();
     bool HasIcon() const { return _hasIcon; }
     float GetPixelSize() const { return (float)(PixelIconGenerator::kLogicalIconSize * _iconPixelScale); }
@@ -27,7 +27,7 @@ public:
 
 protected:
     void Prepare(Theme* theme, BoxStyle& style) override;
-    void DeclareContent(Theme* theme) override;
+    void DeclareContent(Theme* theme) override { (void)theme; };
 
 private:
     bool ColorsEqual(const Clay_Color& a, const Clay_Color& b) const {
@@ -37,7 +37,6 @@ private:
 
     bool _hasIcon = false;
     IconType _iconType = IconType::ArrowUp;
-    uint16_t _iconLogicalSize = 15;
     uint16_t _iconPixelScale = 1;
     bool _iconDirty = true;
 

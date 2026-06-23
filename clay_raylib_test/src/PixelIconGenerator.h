@@ -16,8 +16,6 @@ public:
 
     static Image Generate(
         IconType icon,
-        // Reserved for compatibility; icons are generated from fixed-size tables.
-        uint16_t logicalSize,
         uint16_t pixelScale,
         Clay_Color foreground,
         Clay_Color background

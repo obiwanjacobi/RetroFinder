@@ -1,15 +1,7 @@
 #include "ScrollView.h"
 
-void ScrollView::Prepare(Theme* theme, BoxStyle& style) {
-    ContainerControl::Prepare(theme, style);
-    
-    if (!HasBackgroundColor()) {
-        style.backgroundColor = theme->GetBackgroundColor();
-    }
-}
-
 void ScrollView::DeclareContent(Theme* theme) {
-    _resizeIcon.SetIcon(Icon::IconType::ResizeHandle, 15, 3);
+    _resizeIcon.SetIcon(Icon::IconType::ResizeHandle, 3);
 
     const bool showV = _showVerticalScrollbar;
     const bool showH = _showHorizontalScrollbar;

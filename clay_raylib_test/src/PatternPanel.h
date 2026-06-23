@@ -28,10 +28,7 @@ public:
 
 protected:
     void Prepare(Theme* theme, BoxStyle& style) override;
-    void DeclareContent(Theme* theme) override {
-        //_pattern.Declare(theme);
-        ContainerControl::DeclareContent(theme);
-    }
+    //void DeclareContent(Theme* theme) override { (void)theme; }
 
 private:
     Pattern _pattern;

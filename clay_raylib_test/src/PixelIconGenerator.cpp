@@ -118,13 +118,10 @@ namespace {
 
 Image PixelIconGenerator::Generate(
     IconType icon,
-    uint16_t logicalSize,
     uint16_t pixelScale,
     Clay_Color foreground,
     Clay_Color background
 ) {
-    (void)logicalSize;
-
     if (pixelScale == 0) {
         pixelScale = 1;
     }

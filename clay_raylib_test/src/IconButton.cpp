@@ -1,7 +1,7 @@
 #include "IconButton.h"
 
-void IconButton::SetIcon(IconType icon, uint16_t logicalSize, uint16_t pixelScale) {
-    _icon.SetIcon(icon, logicalSize, pixelScale);
+void IconButton::SetIcon(IconType icon, uint16_t pixelScale) {
+    _icon.SetIcon(icon, pixelScale);
 }
 
 void IconButton::ClearIcon() {
