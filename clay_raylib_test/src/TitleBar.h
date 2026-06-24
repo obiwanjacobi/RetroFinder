@@ -53,6 +53,7 @@ protected:
 
 private:
     PatternPanel _pattern;
+    FloatingPanel _titlePanel;
     FloatingPanel _leftEdge;
     Button _leftButton;
     Button _rightButton;

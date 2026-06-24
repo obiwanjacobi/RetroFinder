@@ -2,14 +2,16 @@
 
 TitleBar::TitleBar(Clay_ElementId id) : Panel(id),
     _pattern(CLAY_ID("titlebar_pattern")),
+    _titlePanel(CLAY_ID("titlebar_title_panel")),
     _leftEdge(CLAY_ID("titlebar_left_edge")),
     _leftButton(CLAY_ID("titlebar_left_button")),
     _rightButton(CLAY_ID("titlebar_right_button")),
     _rightEdge(CLAY_ID("titlebar_right_edge")),
     _title(CLAY_ID("titlebar_title"))
 {
-    _pattern.Add(&_title);
     Add(&_pattern);
+    _titlePanel.Add(&_title);
+    Add(&_titlePanel);
 
     _leftButton.SetText(CLAY_STRING("-"));
     _leftEdge.Add(&_leftButton);
@@ -35,6 +37,19 @@ void TitleBar::DeclareContent(Theme* theme)
     _pattern.SetPatternStyle(PatternPanel::PatternStyle::HorizontalLines);
     _pattern.SetTileSize(12);
     _pattern.SetPixelScale(6);
+
+    _titlePanel.SetBackgroundColor(Clay_Color { 0 });
+    _titlePanel.Layout().padding = { .left = 0, .right = 0, .top = 0, .bottom = 0 };
+    _titlePanel.Floating() = Clay_FloatingElementConfig {
+        .offset = { 0, 0 },
+        .expand = { 0, 0 },
+        .parentId = _pattern.Id().id,
+        .zIndex = 1,
+        .attachPoints = { .element = CLAY_ATTACH_POINT_CENTER_CENTER, .parent = CLAY_ATTACH_POINT_CENTER_CENTER },
+        .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+        .attachTo = CLAY_ATTACH_TO_ELEMENT_WITH_ID,
+        .clipTo = CLAY_CLIP_TO_NONE,
+    };
     
     _title.Layout().padding = { .left = 16, .right = 16, .top = 16, .bottom = 16 };
 
