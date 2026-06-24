@@ -40,8 +40,8 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
     editMenu.AddItem(CLAY_STRING("Redo"), []() { TraceLog(LOG_INFO, "Menu: Edit > Redo"); }, CLAY_STRING("Ctrl+Y"));
 
     auto& viewMenu = _menuBar.AddMenu(CLAY_STRING("View"));
-    viewMenu.AddItem(CLAY_STRING("Toggle Grid"), []() { TraceLog(LOG_INFO, "Menu: View > Toggle Grid"); });
-    
+    viewMenu.AddItem(CLAY_STRING("Toggle Grid"), []() { TraceLog(LOG_INFO, "Disabled MenuItem should not fire!"); }).SetEnabled(false);
+
     Window::Screen().Add(&_titleBar);
     Window::Screen().Add(&_menuBar);
     Window::Screen().Add(&_screen);
