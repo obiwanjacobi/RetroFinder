@@ -146,51 +146,62 @@ void Scrollbar::DeclareTrackAndThumb(Theme* theme)
     _middlePattern.ApplyToStyle(theme, trackStyle);
     _middlePattern.ClearRenderSize();
 
+    // Update current mouse axis position for drag tracking
+    {
+        const Vector2 mousePos = GetMousePosition();
+        const Vector2 winPos = GetWindowPosition();
+        _thumbDragCurrentMouseAxis = vertical
+            ? (mousePos.y + winPos.y)
+            : (mousePos.x + winPos.x);
+    }
+
     // Setup drag handle for thumb interactivity
     {
         const bool isVertical = vertical;
-        const float trackSize = trackAxis;
-        const float thumbSize = thumbAxis;
-        const float maxThumbOffset = trackSize - thumbSize;
+        const float maxThumbOffset = trackAxis - thumbAxis;
+        const float maxScroll = contentAxis - containerAxis;
         const Clay_ElementId targetId = _scrollTargetId;
 
         _thumbDragHandle.SetCanStartDragPredicate([this]() {
             return Clay_PointerOver(_thumbElementId);
         });
 
-        _thumbDragHandle.SetOnDrag([this, isVertical, trackSize, thumbSize, maxThumbOffset, contentAxis, containerAxis, targetId](
-            Vector2 delta) {
-            // Re-fetch scroll data each frame since we can't capture a local reference
+        _thumbDragHandle.SetOnDrag([this, isVertical, maxThumbOffset, maxScroll, targetId](Vector2) {
             Clay_ScrollContainerData currentScrollData = Clay_GetScrollContainerData(targetId);
-            if (!currentScrollData.found || !currentScrollData.scrollPosition) {
+            if (!currentScrollData.found || !currentScrollData.scrollPosition) return;
+            if (maxScroll <= 0.0f || maxThumbOffset <= 0.0f) return;
+
+            if (!_thumbDragActive) {
+                // First callback: anchor the drag to the current position
+                _thumbDragActive = true;
+                _thumbDragStartMouseAxis = _thumbDragCurrentMouseAxis;
+                _thumbDragStartScrollPos = isVertical
+                    ? currentScrollData.scrollPosition->y
+                    : currentScrollData.scrollPosition->x;
                 return;
             }
 
-            const float dragDelta = isVertical ? delta.y : delta.x;
-            const float maxScroll = contentAxis - containerAxis;
-            if (maxScroll <= 0.0f) {
-                return;
-            }
-
-            const float thumbT = maxThumbOffset > 0.0f ? (dragDelta / maxThumbOffset) : 0.0f;
-            const float scrollDelta = thumbT * maxScroll;
-            const float newScroll = isVertical
-                ? currentScrollData.scrollPosition->y - scrollDelta
-                : currentScrollData.scrollPosition->x - scrollDelta;
-
-            const float minScroll = -maxScroll;
-            const float clampedScroll = CLAY__MAX(CLAY__MIN(newScroll, 0.0f), minScroll);
+            const float offset = _thumbDragCurrentMouseAxis - _thumbDragStartMouseAxis;
+            const float scrollT = offset / maxThumbOffset;
+            const float newScroll = CLAY__MAX(-(maxScroll), CLAY__MIN(0.0f,
+                _thumbDragStartScrollPos - scrollT * maxScroll));
 
             if (isVertical) {
-                currentScrollData.scrollPosition->y = clampedScroll;
+                currentScrollData.scrollPosition->y = newScroll;
             } else {
-                currentScrollData.scrollPosition->x = clampedScroll;
+                currentScrollData.scrollPosition->x = newScroll;
             }
         });
     }
 
-    Vector2 mouseScreenPos = { GetMousePosition().x + GetWindowPosition().x, GetMousePosition().y + GetWindowPosition().y };
+    const Vector2 mousePos = GetMousePosition();
+    const Vector2 winPos = GetWindowPosition();
+    const Vector2 mouseScreenPos = { mousePos.x + winPos.x, mousePos.y + winPos.y };
     _thumbDragHandle.Update(mouseScreenPos);
+
+    if (!_thumbDragHandle.IsDragging()) {
+        _thumbDragActive = false;
+    }
 
     if (vertical) {
         DeclareVerticalTrackAndThumb(theme, trackAxis, thumbAxis, thumbOffset, tailAxis, trackStyle);
@@ -298,9 +309,6 @@ void Scrollbar::OnTrackClickCallback(Clay_ElementId elementId, Clay_PointerData 
     Scrollbar* self = static_cast<Scrollbar*>(userData);
     if (elementId.id != self->_trackElementId.id) return;
 
-    // Let the thumb drag handle its own interaction
-    if (Clay_PointerOver(self->_thumbElementId)) return;
-
     Clay_ElementData trackData = Clay_GetElementData(self->_trackElementId);
     Clay_ElementData thumbData = Clay_GetElementData(self->_thumbElementId);
     if (!trackData.found || !thumbData.found) return;
@@ -314,19 +322,23 @@ void Scrollbar::OnTrackClickCallback(Clay_ElementId elementId, Clay_PointerData 
     const float maxScroll = contentAxis - containerAxis;
     if (maxScroll <= 0.0f) return;
 
-    const float trackStart = isVertical ? trackData.boundingBox.y      : trackData.boundingBox.x;
-    const float trackSize  = isVertical ? trackData.boundingBox.height  : trackData.boundingBox.width;
-    const float thumbSize  = isVertical ? thumbData.boundingBox.height  : thumbData.boundingBox.width;
-    const float mousePos   = isVertical ? pointerData.position.y        : pointerData.position.x;
+    const float thumbStart = isVertical ? thumbData.boundingBox.y : thumbData.boundingBox.x;
+    const float thumbSize  = isVertical ? thumbData.boundingBox.height : thumbData.boundingBox.width;
+    const float mousePos   = isVertical ? pointerData.position.y : pointerData.position.x;
 
-    // Center the thumb on the click position
-    const float clickRelative = mousePos - trackStart - thumbSize * 0.5f;
-    const float scrollT = CLAY__MAX(0.0f, CLAY__MIN(1.0f, clickRelative / (trackSize - thumbSize)));
+    // Do nothing when clicking directly on the thumb (drag handles that)
+    if (mousePos >= thumbStart && mousePos <= thumbStart + thumbSize) return;
+
+    // Scroll one page toward the click: back if before the thumb, forward if after
+    const float pageSize = containerAxis;
+    const float direction = (mousePos < thumbStart) ? 1.0f : -1.0f;
+    const float currentScroll = isVertical ? scrollData.scrollPosition->y : scrollData.scrollPosition->x;
+    const float newScroll = CLAY__MAX(-(maxScroll), CLAY__MIN(0.0f, currentScroll + direction * pageSize));
 
     if (isVertical) {
-        scrollData.scrollPosition->y = -(scrollT * maxScroll);
+        scrollData.scrollPosition->y = newScroll;
     } else {
-        scrollData.scrollPosition->x = -(scrollT * maxScroll);
+        scrollData.scrollPosition->x = newScroll;
     }
 }
 

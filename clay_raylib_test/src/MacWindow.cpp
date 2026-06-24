@@ -18,7 +18,7 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
     });
     
     _screen.ShowResizeHandle(true);
-    _screen.SetResizeOnlyWhenScrollable(true);
+    //_screen.SetResizeOnlyWhenScrollable(true);
     _screen.SetOnResize([this](Vector2 delta) {
         int width = GetRenderWidth();
         int height = GetRenderHeight();

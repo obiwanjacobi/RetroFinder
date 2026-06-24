@@ -53,6 +53,10 @@ private:
     Clay_ElementId _thumbElementId = {};
     Clay_ElementId _trackElementId = {};
     DragHandle _thumbDragHandle;
+    bool _thumbDragActive = false;
+    float _thumbDragStartMouseAxis = 0.0f;
+    float _thumbDragStartScrollPos = 0.0f;
+    float _thumbDragCurrentMouseAxis = 0.0f;
     IconButton _startButton;
     IconButton _endButton;
     Pattern _middlePattern;
