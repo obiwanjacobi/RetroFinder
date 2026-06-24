@@ -3,7 +3,7 @@
 #include <cmath>
 
 MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED), 
-    _screen(CLAY_ID("client")), _titleBar(CLAY_ID("titlebar"))
+    _screen(CLAY_ID("client")), _titleBar(CLAY_ID("titlebar")), _menuBar(CLAY_ID("main_menu_bar"))
 {
     _titleBar.SetTitle(CLAY_STRING("Window Title"));
     _titleBar.SetOnMinimize([this]() {
@@ -29,14 +29,28 @@ MacWindow::MacWindow() : Window(ConfigFlags::FLAG_WINDOW_UNDECORATED),
         newHeight = (newHeight < _minHeight) ? _minHeight : newHeight;
         SetSize(newWidth, newHeight);
     });
+
+    auto& fileMenu = _menuBar.AddMenu(CLAY_STRING("File"));
+    fileMenu.AddItem(CLAY_STRING("New"), []() { TraceLog(LOG_INFO, "Menu: File > New"); }, CLAY_STRING("Ctrl+N"));
+    fileMenu.AddItem(CLAY_STRING("Open"), []() { TraceLog(LOG_INFO, "Menu: File > Open"); }, CLAY_STRING("Ctrl+O"));
+    fileMenu.AddItem(CLAY_STRING("Quit"), [this]() { Close(); });
+
+    auto& editMenu = _menuBar.AddMenu(CLAY_STRING("Edit"));
+    editMenu.AddItem(CLAY_STRING("Undo"), []() { TraceLog(LOG_INFO, "Menu: Edit > Undo"); }, CLAY_STRING("Ctrl+Z"));
+    editMenu.AddItem(CLAY_STRING("Redo"), []() { TraceLog(LOG_INFO, "Menu: Edit > Redo"); }, CLAY_STRING("Ctrl+Y"));
+
+    auto& viewMenu = _menuBar.AddMenu(CLAY_STRING("View"));
+    viewMenu.AddItem(CLAY_STRING("Toggle Grid"), []() { TraceLog(LOG_INFO, "Menu: View > Toggle Grid"); });
     
     Window::Screen().Add(&_titleBar);
+    Window::Screen().Add(&_menuBar);
     Window::Screen().Add(&_screen);
 }
 
 void MacWindow::Declare(Theme* theme)
 {
     _titleBar.Layout().sizing = { .width = CLAY_SIZING_GROW(0) };
+    _menuBar.Layout().sizing = { .width = CLAY_SIZING_GROW(0) };
 
     _screen.Layout() = Clay_LayoutConfig { 
         .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) },

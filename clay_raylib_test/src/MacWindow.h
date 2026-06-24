@@ -1,5 +1,6 @@
 #pragma once
 #include "project.h"
+#include "MenuBar.h"
 #include "PatternPanel.h"
 #include "ScrollView.h"
 #include "TitleBar.h"
@@ -25,6 +26,7 @@ public:
 private:
     ScrollView _screen;
     TitleBar _titleBar;
+    MenuBar _menuBar;
     int _minWidth = 300;
     int _minHeight = 200;
 };

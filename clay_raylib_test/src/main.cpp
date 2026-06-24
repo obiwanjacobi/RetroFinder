@@ -37,7 +37,7 @@ int main() {
     }
     
     g_window->Close();
-    
+
     delete g_theme;
     delete g_window;
     return 0;
